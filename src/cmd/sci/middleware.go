@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/uoregon-libraries/gopkg/logger"
+	"github.com/uoregon-libraries/student-course-integrator/src/statusrecorder"
 )
 
 // nocache is a Middleware function to send back no-cache header
@@ -24,21 +25,28 @@ func getIP(req *http.Request) string {
 	return addr
 }
 
+// getIdent combined getIP and the X-Remote-User header for logging
+func getIdent(req *http.Request) string {
+	var addr = getIP(req)
+	var user = req.Header.Get("X-Remote-User")
+	if user == "" {
+		return addr
+	}
+	return user + " - " + addr
+}
+
 func requestLog(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		var addr = getIP(req)
-		var user = req.Header.Get("X-Remote-User")
-
-		// Initialize the fake writer to a status of 200 - if a status isn't
-		// explicitly written, the http library assumes 200
-		var sr = &statusRecorder{w, 200}
+		var sr = statusrecorder.New(w)
 		next.ServeHTTP(sr, req)
+		logger.Infof("Request: [%s] %s - %d", getIdent(req), req.URL, sr.Status)
+	})
+}
 
-		var ident = addr
-		if user != "" {
-			ident = user + " - " + addr
-		}
-
-		logger.Infof("Request: [%s] %s - %d", ident, req.URL, sr.status)
+func requestStaticAssetLog(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		var sr = statusrecorder.New(w)
+		next.ServeHTTP(sr, req)
+		logger.Debugf("Asset Request: [%s] %s - %d", getIdent(req), req.URL, sr.Status)
 	})
 }

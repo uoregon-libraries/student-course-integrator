@@ -20,7 +20,9 @@ func (s *server) Listen() {
 
 	// Static asset server just lets anything in approot/static through to the browser
 	var fileServer = http.FileServer(http.Dir(filepath.Join(s.Approot, "static")))
-	r.NewRoute().PathPrefix("static").Handler(http.StripPrefix("static", fileServer))
+	var fileRouter = r.NewRoute().PathPrefix("/static").Subrouter()
+	fileRouter.Use(requestStaticAssetLog)
+	fileRouter.NewRoute().Handler(http.StripPrefix("/static", fileServer))
 
 	// Everything else gets middleware to avoid browser caching, and to log the
 	// more meaningful requests.  We use a new subrouter to ensure consistency.
