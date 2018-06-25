@@ -22,6 +22,7 @@ func main() {
 	var s = &server{
 		Approot: opts.Approot,
 		Bind:    ":8080",
+		Debug:   config.Conf.Debug,
 	}
 	s.Listen()
 }

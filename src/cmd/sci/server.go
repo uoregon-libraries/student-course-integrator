@@ -13,6 +13,7 @@ import (
 type server struct {
 	Approot string // Path to the app for getting things like templates and static assets
 	Bind    string // Bind address, e.g., ":80" for production
+	Debug   bool   // If true, middleware for hacking userid is added
 }
 
 func (s *server) Listen() {
@@ -27,6 +28,11 @@ func (s *server) Listen() {
 	// Everything else gets middleware to avoid browser caching, and to log the
 	// more meaningful requests.  We use a new subrouter to ensure consistency.
 	var sub = r.NewRoute().PathPrefix("").Subrouter()
+
+	// If we're in debug mode, we need to hack the user header before anything else
+	if s.Debug {
+		sub.Use(fakeUser)
+	}
 	sub.Use(nocache, requestLog)
 	sub.NewRoute().Path("/").HandlerFunc(home)
 	sub.NewRoute().HandlerFunc(http.NotFound)

@@ -50,3 +50,10 @@ func requestStaticAssetLog(next http.Handler) http.Handler {
 		logger.Debugf("Asset Request: [%s] %s - %d", getIdent(req), req.URL, sr.Status)
 	})
 }
+
+func fakeUser(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		req.Header.Set("X-Remote-User", "dummyuser")
+		next.ServeHTTP(w, req)
+	})
+}
