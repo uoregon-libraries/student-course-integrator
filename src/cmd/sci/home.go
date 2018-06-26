@@ -3,6 +3,7 @@ package main
 import (
 	"net/http"
 
+	"github.com/uoregon-libraries/gopkg/logger"
 	"github.com/uoregon-libraries/gopkg/tmpl"
 	"github.com/uoregon-libraries/student-course-integrator/src/data/user"
 )
@@ -35,6 +36,14 @@ func hHome() *homeHandler {
 func (h *homeHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	var user = getContextUser(req)
 	var pageVars = homeVars{User: user}
-	h.tmpl.BufferedExecute(w, pageVars)
-	h.tmpl.Execute(w, pageVars)
+	var err = h.tmpl.BufferedExecute(w, pageVars)
+	logger.Errorf("Error serving homepage: %s", err)
+	if err != nil {
+		w.WriteHeader(500)
+		pageVars.Alert = "Server error encountered.  Try again or contact support."
+		err = empty.Execute(w, pageVars)
+		if err != nil {
+			logger.Criticalf("Error rendering error page: %s", err)
+		}
+	}
 }

@@ -21,7 +21,7 @@ type User struct {
 // Find looks for the user with the given login, returning an unauthorized user
 // if the login isn't found or has no courses
 func Find(login string) *User {
-	return &User{Login: login}
+	return &User{Login: login, Authorized: login != ""}
 }
 
 // String serializes the user's information for display
