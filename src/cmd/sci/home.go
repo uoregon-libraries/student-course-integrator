@@ -8,7 +8,6 @@ import (
 )
 
 type commonVars struct {
-	Title string
 	Alert string
 	Info  string
 }
@@ -39,6 +38,6 @@ func hHome() *homeHandler {
 // ServeHTTP implements http.Handler for homeHandler
 func (h *homeHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	var user = getContextUser(req)
-	var pageVars = &homeVars{User: user, commonVars: commonVars{Title: "Add Canvas Student"}}
+	var pageVars = &homeVars{User: user}
 	render(h.tmpl, w, pageVars)
 }
