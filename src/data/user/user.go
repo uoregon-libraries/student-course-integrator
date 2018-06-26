@@ -13,14 +13,15 @@ type User struct {
 
 	// Authorized users are faculty we have seen in our feed, and must have CRNs associated with them
 	Authorized bool
+
 	// IP is obviously not persistent; it just gives us extra information in case we need it
 	IP string
 }
 
-// Find looks for the user with the given login, returning an empty structure
-// if the given user is not found
+// Find looks for the user with the given login, returning an unauthorized user
+// if the login isn't found or has no courses
 func Find(login string) *User {
-	return &User{}
+	return &User{Login: login}
 }
 
 // String serializes the user's information for display
