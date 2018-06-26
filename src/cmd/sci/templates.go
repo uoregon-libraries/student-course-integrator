@@ -1,6 +1,9 @@
 package main
 
 import (
+	"net/http"
+
+	"github.com/uoregon-libraries/gopkg/logger"
 	"github.com/uoregon-libraries/gopkg/tmpl"
 	"github.com/uoregon-libraries/gopkg/webutil"
 	"github.com/uoregon-libraries/student-course-integrator/src/version"
@@ -34,4 +37,23 @@ func initRootTemplates(templatePath string, debug bool) {
 	layout.MustReadPartials("layout.go.html")
 	insufficientPrivileges = layout.MustBuild("insufficient-privileges.go.html")
 	empty = layout.MustBuild("empty.go.html")
+}
+
+type alertable interface {
+	SetAlert(string)
+}
+
+func render(t *tmpl.Template, w http.ResponseWriter, data alertable) {
+	var err = t.BufferedExecute(w, data)
+	if err == nil {
+		return
+	}
+
+	logger.Errorf("Error serving %q: %s", t.Name, err)
+	w.WriteHeader(500)
+	data.SetAlert("Server error encountered.  Try again or contact support.")
+	err = empty.Execute(w, data)
+	if err != nil {
+		logger.Criticalf("Error rendering error page: %s", err)
+	}
 }
