@@ -3,5 +3,5 @@
 # src/ is detected
 
 while true; do
-  find src/ | entr -d ./makerun.sh;
+  find src/ templates/ | entr -d ./makerun.sh;
 done
