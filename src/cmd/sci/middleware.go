@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/uoregon-libraries/gopkg/logger"
+	"github.com/uoregon-libraries/student-course-integrator/src/data/user"
 	"github.com/uoregon-libraries/student-course-integrator/src/statusrecorder"
 )
 
@@ -25,21 +26,20 @@ func getIP(req *http.Request) string {
 	return addr
 }
 
-// getIdent combined getIP and the X-Remote-User header for logging
-func getIdent(req *http.Request) string {
-	var addr = getIP(req)
-	var user = req.Header.Get("X-Remote-User")
-	if user == "" {
-		return addr
-	}
-	return user + " - " + addr
+// getUser uses the X-Remote-User header to find the user in our database, and
+// associates the current IP address
+func getUser(req *http.Request) *user.User {
+	var login = req.Header.Get("X-Remote-User")
+	var user = user.Find(login)
+	user.IP = getIP(req)
+	return user
 }
 
 func requestLog(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		var sr = statusrecorder.New(w)
 		next.ServeHTTP(sr, req)
-		logger.Infof("Request: [%s] %s - %d", getIdent(req), req.URL, sr.Status)
+		logger.Infof("Request: [%s] %s - %d", getUser(req), req.URL, sr.Status)
 	})
 }
 
@@ -47,13 +47,27 @@ func requestStaticAssetLog(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		var sr = statusrecorder.New(w)
 		next.ServeHTTP(sr, req)
-		logger.Debugf("Asset Request: [%s] %s - %d", getIdent(req), req.URL, sr.Status)
+		logger.Debugf("Asset Request: [%s] %s - %d", getUser(req), req.URL, sr.Status)
 	})
 }
 
 func fakeUser(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		req.Header.Set("X-Remote-User", "dummyuser")
+		next.ServeHTTP(w, req)
+	})
+}
+
+// mustAuth makes sure the logged-in user is allowed to be here, otherwise a
+// 403 is returned
+func mustAuth(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		var user = getUser(req)
+		if !user.Authorized {
+			w.WriteHeader(http.StatusForbidden)
+			insufficientPrivileges.Execute(w, nil)
+			return
+		}
 		next.ServeHTTP(w, req)
 	})
 }

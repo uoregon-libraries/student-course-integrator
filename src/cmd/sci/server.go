@@ -33,7 +33,7 @@ func (s *server) Listen() {
 	if s.Debug {
 		sub.Use(fakeUser)
 	}
-	sub.Use(nocache, requestLog)
+	sub.Use(nocache, requestLog, mustAuth)
 	sub.NewRoute().Path("/").Handler(hHome())
 	sub.NewRoute().HandlerFunc(http.NotFound)
 
