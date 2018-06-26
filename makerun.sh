@@ -11,9 +11,4 @@ make
 if [[ $? == 0 ]]; then
   ./bin/sci &
   echo $! > /tmp/sci-pid
-else
-  echo ""
-  echo
-  echo "ERROR"
-  echo
 fi
