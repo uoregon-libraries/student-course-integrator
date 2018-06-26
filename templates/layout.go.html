@@ -1,0 +1,38 @@
+{{define "layout"}}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>{{.Title}}</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+  </head>
+
+  <body>
+    {{if Debug }}
+      <div class="alert alert-warning">
+        Warning: This site is in DEBUG mode and is <strong>NOT SAFE</strong> for production
+      </div>
+    {{end}}
+
+    <h1>{{.Title}}</h1>
+
+    {{- if .Alert}}
+      <div class="alert alert-danger">
+        <p>{{.Alert}}</p>
+      </div>
+    {{- end}}
+    {{- if .Info}}
+      <div class="alert alert-info">
+        <p>{{.Info}}</p>
+      </div>
+    {{- end}}
+
+    {{block "content" .}}{{end}}
+
+    {{IncludeJS "prevent_double_submit"}}
+    {{block "extrajs" .}}{{end}}
+  </body>
+</html>
+{{Comment (printf "v%s" .Version)}}
+{{end}}

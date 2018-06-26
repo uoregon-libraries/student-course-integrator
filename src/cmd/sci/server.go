@@ -34,7 +34,7 @@ func (s *server) Listen() {
 		sub.Use(fakeUser)
 	}
 	sub.Use(nocache, requestLog)
-	sub.NewRoute().Path("/").HandlerFunc(home)
+	sub.NewRoute().Path("/").Handler(hHome())
 	sub.NewRoute().HandlerFunc(http.NotFound)
 
 	http.Handle("/", r)
@@ -43,8 +43,4 @@ func (s *server) Listen() {
 	if err := http.ListenAndServe(s.Bind, nil); err != nil {
 		logger.Fatalf("Error starting listener: %s", err)
 	}
-}
-
-func home(w http.ResponseWriter, req *http.Request) {
-	w.Write([]byte("Home"))
 }

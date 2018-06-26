@@ -1,0 +1,12 @@
+{{block "content" .}}
+
+<form id="association-form" method="POST" action="{{FullPath "submit-duckid"}}">
+  <label>
+  <p>Duck ID:</p>
+  <input name="duckid" id="duckid" />
+  </label>
+
+  <button type="submit" class="prevent-double-click">Submit</button>
+</form>
+
+{{end}}
