@@ -1,7 +1,7 @@
 Setup
 --
 
-- (Install Go)[https://golang.org/dl/]
+- [Install Go](https://golang.org/dl/)
 - Grab vgo: `go get -u golang.org/x/vgo`
 - `make`
 
