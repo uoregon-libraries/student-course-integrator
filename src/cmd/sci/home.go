@@ -4,7 +4,19 @@ import (
 	"net/http"
 
 	"github.com/uoregon-libraries/gopkg/tmpl"
+	"github.com/uoregon-libraries/student-course-integrator/src/data/user"
 )
+
+type commonVars struct {
+	Title string
+	Alert string
+	Info  string
+}
+
+type homeVars struct {
+	commonVars
+	User *user.User
+}
 
 // homeHandler encapsulates basic data and functionality for handling input and
 // rendering output
@@ -19,6 +31,10 @@ func hHome() *homeHandler {
 	}
 }
 
+// ServeHTTP implements http.Handler for homeHandler
 func (h *homeHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
-	h.tmpl.Execute(w, nil)
+	var user = getContextUser(req)
+	var pageVars = homeVars{User: user}
+	h.tmpl.BufferedExecute(w, pageVars)
+	h.tmpl.Execute(w, pageVars)
 }
