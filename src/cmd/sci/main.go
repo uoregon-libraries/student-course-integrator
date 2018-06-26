@@ -64,4 +64,6 @@ func getConf() {
 	if config.Conf.Debug {
 		logger.Warnf("Debug mode has been enabled")
 	}
+
+	initRootTemplates(filepath.Join(opts.Approot, "templates"), config.Conf.Debug)
 }
