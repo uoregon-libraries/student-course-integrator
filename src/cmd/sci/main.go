@@ -9,6 +9,7 @@ import (
 	"github.com/uoregon-libraries/gopkg/fileutil"
 	"github.com/uoregon-libraries/gopkg/logger"
 	"github.com/uoregon-libraries/student-course-integrator/src/config"
+	"github.com/uoregon-libraries/student-course-integrator/src/global"
 )
 
 var opts struct {
@@ -22,7 +23,7 @@ func main() {
 	var s = &server{
 		Approot: opts.Approot,
 		Bind:    ":8080",
-		Debug:   config.Conf.Debug,
+		Debug:   global.Conf.Debug,
 	}
 	s.Listen()
 }
@@ -56,14 +57,14 @@ func getConf() {
 		}
 	}
 
-	err = config.Parse(opts.ConfigFile)
+	global.Conf, err = config.Parse(opts.ConfigFile)
 	if err != nil {
 		logger.Fatalf("Config error: %s", err)
 	}
 
-	if config.Conf.Debug {
+	if global.Conf.Debug {
 		logger.Warnf("Debug mode has been enabled")
 	}
 
-	initRootTemplates(filepath.Join(opts.Approot, "templates"), config.Conf.Debug)
+	initRootTemplates(filepath.Join(opts.Approot, "templates"), global.Conf.Debug)
 }

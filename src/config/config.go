@@ -15,25 +15,22 @@ type Config struct {
 	SessionSecret   string `setting:"SESSION_SECRET"`
 }
 
-// Conf is the global configuration exposed to the entire app, and as such
-// should be built precisely once, and never be modified
-var Conf = &Config{}
-
 // Parse reads the given settings file and returns a parsed Config.  File paths
 // are parsed and verified as they are used by most subsystems.  The database
 // connection string is built, but is not tested.
-func Parse(filename string) error {
-	// Read settings and store them into Conf
+func Parse(filename string) (*Config, error) {
 	var bc = bashconf.New()
 	bc.EnvironmentPrefix("SCI_")
 	var err = bc.ParseFile(filename)
 	if err != nil {
-		return err
-	}
-	err = bc.Store(Conf)
-	if err != nil {
-		return err
+		return nil, err
 	}
 
-	return nil
+	var conf = new(Config)
+	err = bc.Store(conf)
+	if err != nil {
+		return nil, err
+	}
+
+	return conf, nil
 }
