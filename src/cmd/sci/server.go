@@ -31,9 +31,9 @@ func (s *server) Listen() {
 
 	// If we're in debug mode, we need to hack the user header before anything else
 	if s.Debug {
-		sub.Use(fakeUser)
+		sub.Use(fakeUserLogin)
 	}
-	sub.Use(nocache, requestLog)
+	sub.Use(getUser, nocache, requestLog, mustAuth)
 	sub.NewRoute().Path("/").Handler(hHome())
 	sub.NewRoute().HandlerFunc(http.NotFound)
 
