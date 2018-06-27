@@ -50,6 +50,10 @@ func render(t *tmpl.Template, w http.ResponseWriter, data alertable) {
 	}
 
 	logger.Errorf("Error serving %q: %s", t.Name, err)
+	render500(w, err, data)
+}
+
+func render500(w http.ResponseWriter, err error, data alertable) {
 	w.WriteHeader(500)
 	data.SetAlert("Server error encountered.  Try again or contact support.")
 	err = empty.Execute(w, data)
