@@ -97,7 +97,7 @@ func mustAuth(next http.Handler) http.Handler {
 		var user = getContextUser(req)
 		if !user.Authorized {
 			w.WriteHeader(http.StatusForbidden)
-			insufficientPrivileges.Execute(w, nil)
+			insufficientPrivileges.Execute(w, &commonVars{User: user})
 			return
 		}
 		next.ServeHTTP(w, req)

@@ -10,6 +10,7 @@ import (
 type commonVars struct {
 	Alert string
 	Info  string
+	User *user.User
 }
 
 // SetAlert implements alertable for the template rendering function
@@ -19,7 +20,6 @@ func (v *commonVars) SetAlert(val string) {
 
 type homeVars struct {
 	commonVars
-	User *user.User
 }
 
 // homeHandler encapsulates basic data and functionality for handling input and
@@ -38,6 +38,6 @@ func hHome() *homeHandler {
 // ServeHTTP implements http.Handler for homeHandler
 func (h *homeHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	var user = getContextUser(req)
-	var pageVars = &homeVars{User: user}
+	var pageVars = &homeVars{commonVars{User: user}}
 	render(h.tmpl, w, pageVars)
 }
