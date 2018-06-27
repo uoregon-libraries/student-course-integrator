@@ -9,6 +9,6 @@ fi
 
 make
 if [[ $? == 0 ]]; then
-  ./bin/sci &
+  ./bin/sci-server &
   echo $! > /tmp/sci-pid
 fi
