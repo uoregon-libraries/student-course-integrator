@@ -1,4 +1,4 @@
-.PHONY: all binaries clean
+.PHONY: all binaries clean dbconf
 
 GO=vgo
 GOFMT=gofmt -s -l -w
@@ -16,3 +16,6 @@ format:
 
 clean:
 	rm bin/* -f
+
+dbconf:
+	./scripts/makedbconf.sh

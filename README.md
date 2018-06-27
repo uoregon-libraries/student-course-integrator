@@ -3,6 +3,7 @@ Setup
 
 - [Install Go](https://golang.org/dl/)
 - Grab vgo: `go get -u golang.org/x/vgo`
+- Get goose for database migrations: `go get -u bitbucket.org/liamstask/goose/...`
 - `make`
 
 If you've installed [entr](http://www.entrproject.org/), you can speed up your
@@ -23,7 +24,34 @@ In production, use this to avoid storing sensitive values in `sci.conf`:
     export SCI_DB=sciusername:password@tcp(localhost:port)/scidbname
     export SCI_SESSION_SECRET=blah
 
+Set up the database
+---
+
+This project uses [goose](https://bitbucket.org/liamstask/goose) for managing
+the database.  Create a database with mysql or mariadb, set up a
+`db/dbconf.yml` file:
+
+```yaml
+development:
+  driver: mysql
+  open: user:password@tcp(localhost:port)/databasename
+```
+
+And finally, run `goose up`.
+
+The Makefile has a target which generates `db/dbconf.yml` for you if your DB
+config lives in `/etc/sci.conf` or `./sci.conf`:
+
+```bash
+make dbconf
+```
+
+This eliminates the need to generate your db config, but note that it will
+overwrite any existing `db/dbconf.yml`.
+
 Run the server
 ---
 
-`./bin/sci-server`
+```bash
+./bin/sci-server
+```
