@@ -1,4 +1,4 @@
-package main
+package sciserver
 
 import (
 	"net/http"

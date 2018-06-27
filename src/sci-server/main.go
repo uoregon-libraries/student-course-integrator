@@ -1,4 +1,4 @@
-package main
+package sciserver
 
 import (
 	"fmt"
@@ -17,7 +17,7 @@ var opts struct {
 	ConfigFile string `short:"c" long:"config" description:"path to SCI config file if not /etc/sci.conf or ./sci.conf"`
 }
 
-func main() {
+func Run() {
 	getConf()
 
 	var s = &server{
