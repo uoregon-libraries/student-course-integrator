@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-# This builds and starts up the server or dies loudly
+#
+# This builds and starts up the server
 
 if [[ -f /tmp/sci-pid ]]; then
   echo "*** Terminating process"

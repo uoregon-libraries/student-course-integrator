@@ -6,16 +6,16 @@ Setup
 - `make`
 
 If you've installed [entr](http://www.entrproject.org/), you can speed up your
-development loop by running [`devloop.sh`](./devloop.sh), which runs
-[`makerun.sh`](./makerun.sh) whenever `entr` detects a change to any file or
-directory under `src/`.
+development loop by running [`./scripts/devloop.sh`](./scripts/devloop.sh),
+which runs [`makerun.sh`](./scripts/makerun.sh) whenever `entr` detects a
+change to any file or directory under `src/`.
 
 Settings file
 ---
 
 Copy example.conf to sci.conf and modify it as needed.  SCI will look for this
 file at `/etc/sci.conf`, then `./sci.conf`.  You can pass the `-c` flag to
-specify a custom location as well, e.g., `./bin/sci -c /tmp/dummysettings.conf`.
+specify a custom location as well, e.g., `./bin/sci-server -c /tmp/dummysettings.conf`.
 
 All settings can be overridden with environment variables prefixed with "SCI_".
 In production, use this to avoid storing sensitive values in `sci.conf`:
@@ -26,4 +26,4 @@ In production, use this to avoid storing sensitive values in `sci.conf`:
 Run the server
 ---
 
-`./bin/sci`
+`./bin/sci-server`
