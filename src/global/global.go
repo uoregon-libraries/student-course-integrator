@@ -3,9 +3,14 @@
 package global
 
 import (
+	"database/sql"
+
 	"github.com/uoregon-libraries/student-course-integrator/src/config"
 )
 
 // Conf is the global configuration exposed to the entire app, and as such
 // should be built precisely once, and never be modified
 var Conf *config.Config
+
+// DB is our persistent database connection
+var DB *sql.DB

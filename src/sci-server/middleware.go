@@ -37,11 +37,18 @@ func getRemoteUser(req *http.Request) string {
 
 // findUser uses the X-Remote-User header to find the user in our database, and
 // associates the current IP address
-func findUser(req *http.Request) *user.User {
+func findUser(req *http.Request) (*user.User, error) {
 	var login = getRemoteUser(req)
-	var user = user.Find(login)
+	var user, err = user.Find(login)
+	if err != nil {
+		logger.Criticalf("Unable to get user data for %q: %s", login, err)
+		return nil, err
+	}
+	if user.Login == "" {
+		logger.Warnf("User with no login tried to get authorization")
+	}
 	user.IP = getIP(req)
-	return user
+	return user, nil
 }
 
 // getContextUser returns the user retrieved from the request context
@@ -84,7 +91,12 @@ func fakeUserLogin(next http.Handler) http.Handler {
 // request via context
 func getUser(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		var user = findUser(req)
+		var user, err = findUser(req)
+		if err != nil {
+			logger.Criticalf("Database error trying to look up user: %s", err)
+			render500(w, err, &commonVars{})
+			return
+		}
 		context.Set(req, "user", user)
 		next.ServeHTTP(w, req)
 	})
