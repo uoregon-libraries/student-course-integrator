@@ -13,6 +13,7 @@ type Config struct {
 	Debug           bool   `setting:"DEBUG" type:"bool"`
 	BindAddress     string `setting:"BIND_ADDRESS"`
 	SessionSecret   string `setting:"SESSION_SECRET"`
+	AuthHeader      string `setting:"AUTH_HEADER"`
 }
 
 // Parse reads the given settings file and returns a parsed Config.  File paths

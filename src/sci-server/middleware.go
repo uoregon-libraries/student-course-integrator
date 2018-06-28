@@ -6,6 +6,7 @@ import (
 	"github.com/gorilla/context"
 	"github.com/uoregon-libraries/gopkg/logger"
 	"github.com/uoregon-libraries/student-course-integrator/src/data/user"
+	"github.com/uoregon-libraries/student-course-integrator/src/global"
 	"github.com/uoregon-libraries/student-course-integrator/src/statusrecorder"
 )
 
@@ -28,7 +29,7 @@ func getIP(req *http.Request) string {
 }
 
 func getRemoteUser(req *http.Request) string {
-	var u = req.Header.Get("X-Remote-User")
+	var u = req.Header.Get(global.Conf.AuthHeader)
 	if u == "" {
 		return "N/A"
 	}
