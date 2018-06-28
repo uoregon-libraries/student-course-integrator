@@ -27,8 +27,18 @@ In production, use this to avoid storing sensitive values in `sci.conf`:
 Set up the database
 ---
 
+You'll need to set up a database and user for SCI to store its faculty/course
+association.  For development, this is trivial by using the supplied
+docker-compose configuration:
+
+```bash
+  docker-compose up -d
+```
+
+That would generate a database with username, password, and database name of "sci".
+
 This project uses [goose](https://bitbucket.org/liamstask/goose) for managing
-the database.  Create a database with mysql or mariadb, set up a
+the database tables.  Create a database with mysql or mariadb, set up a
 `db/dbconf.yml` file:
 
 ```yaml
