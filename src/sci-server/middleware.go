@@ -36,8 +36,8 @@ func getRemoteUser(req *http.Request) string {
 	return u
 }
 
-// findUser uses the X-Remote-User header to find the user in our database, and
-// associates the current IP address
+// findUser uses the configured auth header to find the user in our database,
+// and associates the current IP address
 func findUser(req *http.Request) (*user.User, error) {
 	var login = getRemoteUser(req)
 	var user, err = user.Find(login)
@@ -83,7 +83,7 @@ func requestStaticAssetLog(next http.Handler) http.Handler {
 
 func fakeUserLogin(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		req.Header.Set("X-Remote-User", "dummyuser")
+		req.Header.Set(global.Conf.AuthHeader, "dummyuser")
 		next.ServeHTTP(w, req)
 	})
 }
