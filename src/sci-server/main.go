@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/jessevdk/go-flags"
 	"github.com/uoregon-libraries/gopkg/fileutil"
@@ -48,13 +49,17 @@ func getConf() {
 		}
 	}
 
+	var files = []string{"/etc/sci.conf", filepath.Join(opts.Approot, "sci.conf")}
 	if opts.ConfigFile == "" {
-		var files = []string{"/etc/sci.conf", filepath.Join(opts.Approot, "sci.conf")}
 		for _, file := range files {
 			if fileutil.Exists(file) {
 				opts.ConfigFile = file
 			}
 		}
+	}
+
+	if opts.ConfigFile == "" {
+		logger.Fatalf("Config error: no config file found in %s", strings.Join(files, ", "))
 	}
 
 	global.Conf, err = config.Parse(opts.ConfigFile)
