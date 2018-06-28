@@ -10,6 +10,16 @@ development loop by running [`./scripts/devloop.sh`](./scripts/devloop.sh),
 which runs [`makerun.sh`](./scripts/makerun.sh) whenever `entr` detects a
 change to any file or directory under `src/`.
 
+**Note**: The make recipe uses vgo, which doesn't install compiled packages in
+a location that's friendly for things like `gocode` to give you auto-completion
+features.  If you want compiled package files generated, you'll have to
+override the `INSTALL` variable when you run `make`:
+
+```bash
+export INSTALL=1
+make -e # Or ./scripts/devloop.sh, which already adds the -e flag to make
+```
+
 Settings file
 ---
 

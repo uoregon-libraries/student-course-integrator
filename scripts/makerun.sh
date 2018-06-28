@@ -8,7 +8,7 @@ if [[ -f /tmp/sci-pid ]]; then
   rm /tmp/sci-pid
 fi
 
-make
+make -e
 if [[ $? == 0 ]]; then
   ./bin/sci-server &
   echo $! > /tmp/sci-pid
