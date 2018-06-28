@@ -1,10 +1,12 @@
 package sciserver
 
 import (
+	"database/sql"
 	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 
 	"github.com/jessevdk/go-flags"
 	"github.com/uoregon-libraries/gopkg/fileutil"
@@ -72,4 +74,10 @@ func getConf() {
 	}
 
 	initRootTemplates(filepath.Join(opts.Approot, "templates"), global.Conf.Debug)
+
+	global.DB, err = sql.Open("mysql", global.Conf.DatabaseConnect)
+	if err != nil {
+		logger.Fatalf("Error trying to connect to database: %s", err)
+	}
+	global.DB.SetConnMaxLifetime(time.Second * 14400)
 }
