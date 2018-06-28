@@ -18,6 +18,9 @@ type server struct {
 
 func (s *server) Listen() {
 	var r = mux.NewRouter()
+	if s.Debug {
+		r.Use(fakeUserLogin)
+	}
 
 	// Static asset server just lets anything in approot/static through to the browser
 	var fileServer = http.FileServer(http.Dir(filepath.Join(s.Approot, "static")))
@@ -30,9 +33,6 @@ func (s *server) Listen() {
 	var sub = r.NewRoute().PathPrefix("").Subrouter()
 
 	// If we're in debug mode, we need to hack the user header before anything else
-	if s.Debug {
-		sub.Use(fakeUserLogin)
-	}
 	sub.Use(getUser, nocache, requestLog, mustAuth)
 	sub.NewRoute().Path("/").Handler(hHome())
 	sub.NewRoute().HandlerFunc(http.NotFound)
