@@ -1,4 +1,4 @@
-.PHONY: all binaries clean dbconf
+.PHONY: all binaries test clean dbconf
 
 GO=vgo
 GOFMT=gofmt -s -l -w
@@ -14,6 +14,9 @@ binaries:
 format:
 	@$(GOFMT) main.go
 	@find src -name "*.go" | xargs $(GOFMT)
+
+test:
+	@$(GO) test ./... | grep -v "^?.*no test files"
 
 clean:
 	rm bin/* -f
