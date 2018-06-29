@@ -9,7 +9,7 @@ all: binaries
 binaries:
 	$(GO) build -o bin/sci-server github.com/uoregon-libraries/student-course-integrator
 	@# This is helpful to get code completion tools working while vgo is still in transition
-	@[[ $(INSTALL) != 1 ]] || go install ./src/...
+	@[[ $(INSTALL) != 1 ]] || ./scripts/install.sh
 
 format:
 	@$(GOFMT) main.go
