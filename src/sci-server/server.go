@@ -18,6 +18,8 @@ type server struct {
 
 func (s *server) Listen() {
 	var r = mux.NewRouter()
+
+	// If we're in debug mode, we need to hack the user header before anything else
 	if s.Debug {
 		r.Use(fakeUserLogin)
 	}
@@ -32,7 +34,6 @@ func (s *server) Listen() {
 	// more meaningful requests.  We use a new subrouter to ensure consistency.
 	var sub = r.NewRoute().PathPrefix("").Subrouter()
 
-	// If we're in debug mode, we need to hack the user header before anything else
 	sub.Use(getUser, nocache, requestLog, mustAuth)
 	sub.NewRoute().Path("/").Handler(hHome())
 	sub.NewRoute().HandlerFunc(http.NotFound)
