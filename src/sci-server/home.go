@@ -10,7 +10,7 @@ import (
 type commonVars struct {
 	Alert string
 	Info  string
-	User *user.User
+	User  *user.User
 }
 
 // SetAlert implements alertable for the template rendering function
