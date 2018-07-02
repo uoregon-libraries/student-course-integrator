@@ -36,7 +36,7 @@ func (u *User) String() string {
 	if u.Login == "" {
 		login = "N/A"
 	}
-	return fmt.Sprintf("%s - %s - %v", login, u.IP, u.Authorized)
+	return fmt.Sprintf("%s - %s - auth: %v", login, u.IP, u.Authorized)
 }
 
 // readDB grabs all courses associated with this person (if any) and attaches
