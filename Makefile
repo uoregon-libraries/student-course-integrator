@@ -15,6 +15,11 @@ format:
 	@$(GOFMT) main.go
 	@find src -name "*.go" | xargs $(GOFMT)
 
+validate:
+	find ./src -type f -name "*.go" | sed -s "s|/\w\+\.go||" | sort | uniq | xargs go vet
+	find ./src -type f -name "*.go" | sed -s "s|/\w\+\.go||" | sort | uniq | xargs golint
+	find ./src -type f -name "*.go" | xargs gofmt -l -s
+
 test:
 	@$(GO) test ./... | grep -v "^?.*no test files"
 
