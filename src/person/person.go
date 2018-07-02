@@ -28,8 +28,10 @@ func FindByDuckID(duckid string) (*Person, error) {
 		return nil, err
 	}
 
-	// TODO: Ping service to get university ID
-	p.UniversityID = "N/A"
+	if p != nil {
+		// TODO: Ping service to get university ID
+		p.UniversityID = "N/A"
+	}
 	return p, nil
 }
 
