@@ -39,7 +39,7 @@ func FindByDuckID(duckid string) (*Person, error) {
 // a GE on a course
 func (p *Person) CanGE() bool {
 	var validAffiliations = map[string]bool{
-		"staff": true,
+		"gtf": true,
 	}
 	for _, aff := range p.Affiliations {
 		if validAffiliations[aff] {
