@@ -83,7 +83,27 @@ func requestStaticAssetLog(next http.Handler) http.Handler {
 
 func fakeUserLogin(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		req.Header.Set(global.Conf.AuthHeader, "dummyuser")
+		// Get user session
+		var s = getSession(w, req)
+
+		// First check query args for a username
+		var username = req.FormValue("debuguser")
+		if username != "" {
+			s.SetString("debuguser", username)
+		}
+
+		// Now check session; if we had an arg above, it will be stored here.  This
+		// extra round-trip makes sure our session logic works.  It can be very
+		// annoying to debug session data when it seems like it worked, but turns
+		// out it was just the hit that had the query arg which worked, while the
+		// session had some odd misconfiguration.
+		username = s.GetString("debuguser")
+
+		// Still no name?  This app requires a user, so we will just set up a fake name.
+		if username == "" {
+			username = "dummyuser"
+		}
+		req.Header.Set(global.Conf.AuthHeader, username)
 		next.ServeHTTP(w, req)
 	})
 }

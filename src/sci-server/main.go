@@ -8,6 +8,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/gorilla/sessions"
 	"github.com/jessevdk/go-flags"
 	"github.com/uoregon-libraries/gopkg/fileutil"
 	"github.com/uoregon-libraries/gopkg/logger"
@@ -80,4 +81,6 @@ func getConf() {
 		logger.Fatalf("Error trying to connect to database: %s", err)
 	}
 	global.DB.SetConnMaxLifetime(time.Second * 14400)
+
+	global.Store = sessions.NewCookieStore([]byte(global.Conf.SessionSecret))
 }
