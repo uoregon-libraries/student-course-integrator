@@ -6,21 +6,6 @@ Setup
 - Get goose for database migrations: `go get -u bitbucket.org/liamstask/goose/...`
 - `make`
 
-If you've installed [entr](http://www.entrproject.org/), you can speed up your
-development loop by running [`./scripts/devloop.sh`](./scripts/devloop.sh),
-which runs [`makerun.sh`](./scripts/makerun.sh) whenever `entr` detects a
-change to any file or directory under `src/`.
-
-**Note**: The make recipe uses vgo, which doesn't install compiled packages in
-a location that's friendly for things like `gocode` to give you auto-completion
-features.  If you want compiled package files generated, you'll have to
-override the `INSTALL` variable when you run `make`:
-
-```bash
-export INSTALL=1
-make -e # Or ./scripts/devloop.sh, which already adds the -e flag to make
-```
-
 Settings file
 ---
 
@@ -75,3 +60,30 @@ Run the server
 ```bash
 ./bin/sci-server
 ```
+
+Development
+---
+
+As mentioned above, consider using docker to ease development by giving you a
+preconfigured database.  You can then populate the "sci" database tables with
+any fake (or real) courses and user ids.  To log in as any given user, make
+sure you have DEBUG set to true in your configuration (or `export SCI_DEBUG =
+1` to temporarily set this up), then visit the app with a "debuguser" query
+argument.  For example, `http://localhost:8080/?debuguser=jechols`.
+
+If you install [entr](http://www.entrproject.org/), you can speed up your
+development loop by running [`./scripts/devloop.sh`](./scripts/devloop.sh),
+which runs [`makerun.sh`](./scripts/makerun.sh) whenever `entr` detects a
+change to any file or directory under `src/`.
+
+**Note**: The make recipe uses vgo, which doesn't install compiled packages in
+a location that's friendly for things like `gocode` to give you auto-completion
+features.  If you want compiled package files generated, you'll have to
+override the `INSTALL` variable when you run `make`:
+
+```bash
+export INSTALL=1
+make -e
+```
+
+`./scripts/devloop.sh` runs this way in order to ease development as much as it can.
