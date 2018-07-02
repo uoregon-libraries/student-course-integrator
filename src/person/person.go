@@ -35,9 +35,9 @@ func FindByDuckID(duckid string) (*Person, error) {
 	return p, nil
 }
 
-// CanGE returns true if this person's affiliations allow being assigned as
-// a GE on a course
-func (p *Person) CanGE() bool {
+// IsGTF returns true if this person's affiliations allow being assigned as
+// a GTF on a course
+func (p *Person) IsGTF() bool {
 	var validAffiliations = map[string]bool{
 		"gtf": true,
 	}

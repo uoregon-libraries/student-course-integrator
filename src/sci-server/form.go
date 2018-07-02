@@ -41,7 +41,7 @@ func (r *response) getForm() (f form, err error) {
 	}
 	if f.student == nil {
 		f.errors = append(f.errors, errors.New("duckid doesn't match a known student"))
-	} else if !f.student.CanGE() {
+	} else if !f.student.IsGTF() {
 		f.errors = append(f.errors, errors.New(f.student.DisplayName+" is not a GTF"))
 	}
 
