@@ -14,6 +14,10 @@ type Config struct {
 	BindAddress     string `setting:"BIND_ADDRESS"`
 	SessionSecret   string `setting:"SESSION_SECRET"`
 	AuthHeader      string `setting:"AUTH_HEADER"`
+	LDAPServer      string `setting:"LDAP_SERVER"`
+	LDAPUser        string `setting:"LDAP_BIND_USER"`
+	LDAPPass        string `setting:"LDAP_BIND_PASS"`
+	LDAPBaseDN      string `setting:"LDAP_BASE_DN"`
 }
 
 // Parse reads the given settings file and returns a parsed Config.  File paths
