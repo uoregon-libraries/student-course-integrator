@@ -3,10 +3,20 @@
 
 {{block "content" .}}
 
-<form id="association-form" method="POST" action="{{FullPath "submit-duckid"}}">
+<form id="association-form" method="POST" action="{{FullPath ""}}">
   <label>
   <p>Duck ID:</p>
-  <input name="duckid" id="duckid" />
+  <input name="duckid" id="duckid" value="{{.Form.DuckID}}"/>
+  </label>
+
+  <label>
+  <p>Course</p>
+  <select name="crn" id="crn">
+    <option value="">Select a course</option>
+  {{range .User.Courses}}
+    <option value="{{.CRN}}" {{if eq .CRN $.Form.CRN}}selected {{end}}>{{.Description}}</option>
+  {{end}}
+  </select>
   </label>
 
   <button type="submit" class="prevent-double-click">Submit</button>
