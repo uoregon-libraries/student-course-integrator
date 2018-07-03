@@ -29,7 +29,8 @@ type homeVars struct {
 // homeHandler encapsulates basic data and functionality for handling input and
 // rendering output
 type homeHandler struct {
-	tmpl *tmpl.Template
+	formTemplate    *tmpl.Template
+	successTemplate *tmpl.Template
 }
 
 // response wraps the writer and request to provide us a simpler approach to
@@ -38,20 +39,21 @@ type response struct {
 	w    http.ResponseWriter
 	req  *http.Request
 	user *user.User
-	tmpl *tmpl.Template
+	hh   *homeHandler
 }
 
 func hHome() *homeHandler {
 	var r = layout.Clone()
 	return &homeHandler{
-		tmpl: r.MustBuild("home.go.html"),
+		formTemplate:    r.MustBuild("home.go.html"),
+		successTemplate: r.MustBuild("enroll_success.go.html"),
 	}
 }
 
 // ServeHTTP implements http.Handler for homeHandler
 func (h *homeHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	var user = getContextUser(req)
-	var r = &response{w, req, user, h.tmpl}
+	var r = &response{w, req, user, h}
 	if req.Method == "POST" {
 		r.processSubmission()
 		return
@@ -77,6 +79,8 @@ func (r *response) processSubmission() {
 			return
 		}
 		audit.Log(r.user, audit.ActionAssociateStudent, msg)
+
+		render(r.hh.successTemplate, r.w, pageVars)
 		return
 	}
 
@@ -85,10 +89,10 @@ func (r *response) processSubmission() {
 	audit.Log(r.user, audit.ActionAssociateStudent, msg)
 	pageVars.Alert = fmt.Sprintf("The following errors prevented associating %q with CRN %q: %s",
 		f.DuckID, f.CRN, f.errorString())
-	render(r.tmpl, r.w, pageVars)
+	render(r.hh.formTemplate, r.w, pageVars)
 }
 
 // serveForm has no logic to handle, just a form to render
 func (r *response) serveForm() {
-	render(r.tmpl, r.w, &homeVars{commonVars: commonVars{User: r.user}})
+	render(r.hh.formTemplate, r.w, &homeVars{commonVars: commonVars{User: r.user}})
 }
