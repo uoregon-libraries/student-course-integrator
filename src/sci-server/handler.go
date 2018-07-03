@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/uoregon-libraries/gopkg/tmpl"
+	"github.com/uoregon-libraries/student-course-integrator/src/data/audit"
 	"github.com/uoregon-libraries/student-course-integrator/src/data/user"
 )
 
@@ -60,16 +61,22 @@ func (h *homeHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 func (r *response) processSubmission() {
 	var f, err = r.getForm()
 	if err != nil {
-		render500(r.w, fmt.Errorf("unable to instantiate form: %s", err), &commonVars{})
+		render500(r.w, fmt.Errorf("unable to instantiate form data: %s", err), &commonVars{})
 		return
 	}
 
+	var msg = fmt.Sprintf("student %q -> course %q", f.DuckID, f.CRN)
+
 	if len(f.errors) == 0 {
+		audit.Log(r.user, audit.ActionAssociateStudent, msg)
+
 		// TODO: Do stuff
 		return
 	}
 
 	// No-go, re-render the form
+	msg += "; FAILURE: " + f.errorString()
+	audit.Log(r.user, audit.ActionAssociateStudent, msg)
 	var pageVars = &homeVars{}
 	pageVars.User = r.user
 	pageVars.Alert = fmt.Sprintf("The following errors prevented associating %q with CRN %q: %s",
