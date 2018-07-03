@@ -56,6 +56,7 @@ func render(t *tmpl.Template, w http.ResponseWriter, data alertable) {
 func render500(w http.ResponseWriter, err error, data alertable) {
 	w.WriteHeader(500)
 	data.SetAlert("Server error encountered.  Try again or contact support.")
+	logger.Errorf("Server error: %s", err)
 	err = empty.Execute(w, data)
 	if err != nil {
 		logger.Criticalf("Error rendering error page: %s", err)
