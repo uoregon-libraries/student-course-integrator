@@ -80,7 +80,7 @@ func getConf() {
 	if err != nil {
 		logger.Fatalf("Error trying to connect to database: %s", err)
 	}
-	global.DB.SetConnMaxLifetime(time.Second * 14400)
+	global.DB.SetConnMaxLifetime(time.Second)
 
 	global.Store = sessions.NewCookieStore([]byte(global.Conf.SessionSecret))
 }
