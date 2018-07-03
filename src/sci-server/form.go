@@ -12,15 +12,15 @@ import (
 type form struct {
 	CRN     string
 	DuckID  string
-	user    *user.User
-	student *person.Person
+	User    *user.User
+	Student *person.Person
 	errors  []error
 }
 
 func (r *response) getForm() (f form, err error) {
 	f.CRN = r.req.PostFormValue("crn")
 	f.DuckID = r.req.PostFormValue("duckid")
-	f.user = r.user
+	f.User = r.user
 
 	if f.DuckID == "" {
 		f.errors = append(f.errors, errors.New("duckid must be filled out"))
@@ -35,18 +35,18 @@ func (r *response) getForm() (f form, err error) {
 	}
 
 	// Make sure the duckid is valid and represents a GTF
-	f.student, err = person.FindByDuckID(f.DuckID)
+	f.Student, err = person.FindByDuckID(f.DuckID)
 	if err != nil {
 		return f, err
 	}
-	if f.student == nil {
+	if f.Student == nil {
 		f.errors = append(f.errors, errors.New("duckid doesn't match a known student"))
-	} else if !f.student.IsGTF() {
-		f.errors = append(f.errors, errors.New(f.student.DisplayName+" is not a GTF"))
+	} else if !f.Student.IsGTF() {
+		f.errors = append(f.errors, errors.New(f.Student.DisplayName+" is not a GTF"))
 	}
 
 	// Make sure the logged-in user is allowed to assign people to this crn
-	if !f.user.HasCourse(f.CRN) {
+	if !f.User.HasCourse(f.CRN) {
 		f.errors = append(f.errors, errors.New("the chosen course is invalid"))
 	}
 
