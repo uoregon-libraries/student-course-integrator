@@ -7,6 +7,7 @@ import (
 	"github.com/uoregon-libraries/gopkg/tmpl"
 	"github.com/uoregon-libraries/student-course-integrator/src/data/audit"
 	"github.com/uoregon-libraries/student-course-integrator/src/data/user"
+	"github.com/uoregon-libraries/student-course-integrator/src/data/enrollment"
 )
 
 type commonVars struct {
@@ -70,9 +71,12 @@ func (r *response) processSubmission() {
 	var msg = fmt.Sprintf("student %q -> course %q", f.DuckID, f.CRN)
 
 	if len(f.errors) == 0 {
+		err = enrollment.AddGTF(f.CRN, f.DuckID)
+		if err != nil {
+			render500(r.w, fmt.Errorf("unable to write enrollment data to database: %s", err), pageVars)
+			return
+		}
 		audit.Log(r.user, audit.ActionAssociateStudent, msg)
-
-		// TODO: Do stuff
 		return
 	}
 
