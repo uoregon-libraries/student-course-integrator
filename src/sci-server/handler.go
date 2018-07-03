@@ -6,8 +6,8 @@ import (
 
 	"github.com/uoregon-libraries/gopkg/tmpl"
 	"github.com/uoregon-libraries/student-course-integrator/src/data/audit"
-	"github.com/uoregon-libraries/student-course-integrator/src/data/user"
 	"github.com/uoregon-libraries/student-course-integrator/src/data/enrollment"
+	"github.com/uoregon-libraries/student-course-integrator/src/data/user"
 )
 
 type commonVars struct {

@@ -21,6 +21,12 @@ var opts struct {
 	ConfigFile string `short:"c" long:"config" description:"path to SCI config file if not /etc/sci.conf or ./sci.conf"`
 }
 
+// Run is the top-level method to execute when wanting to run this as the web
+// service.  Exposing it like this allows us to have a top-level main.go which
+// is dead simple.  It also gives us flexibility to potentially have a
+// top-level command where this is simply a subcommand; e.g.:
+//
+//    ./sbin/sci server
 func Run() {
 	getConf()
 
