@@ -30,6 +30,7 @@ type homeVars struct {
 // rendering output
 type homeHandler struct {
 	formTemplate    *tmpl.Template
+	confirmTemplate *tmpl.Template
 	successTemplate *tmpl.Template
 }
 
@@ -46,6 +47,7 @@ func hHome() *homeHandler {
 	var r = layout.Clone()
 	return &homeHandler{
 		formTemplate:    r.MustBuild("home.go.html"),
+		confirmTemplate: r.MustBuild("confirm_duckid.go.html"),
 		successTemplate: r.MustBuild("enroll_success.go.html"),
 	}
 }
@@ -72,24 +74,41 @@ func (r *response) processSubmission() {
 	pageVars.Form = f
 	var msg = fmt.Sprintf("student %q -> course %q", f.DuckID, f.CRN)
 
-	if len(f.errors) == 0 {
+	// Explicit rejection of duckid was requested: re-render the form
+	if f.Confirm == "0" {
+		msg += "; wrong duckid, re-rendering form"
+		audit.Log(r.user, audit.ActionAssociateStudent, msg)
+		render(r.hh.formTemplate, r.w, pageVars)
+		return
+	}
+
+	// Errors: re-render the form
+	if len(f.errors) > 0 {
+		msg += "; FAILURE: " + f.errorString()
+		audit.Log(r.user, audit.ActionAssociateStudent, msg)
+		pageVars.Alert = fmt.Sprintf("The following errors prevented associating %q with CRN %q: %s",
+			f.DuckID, f.CRN, f.errorString())
+		render(r.hh.formTemplate, r.w, pageVars)
+		return
+	}
+
+	// Require "confirm" to be exactly the string "1" so that we err on the side of not adding students
+	if f.Confirm == "1" {
+		msg += "; CONFIRMED"
 		err = enrollment.AddGTF(f.CRN, f.DuckID)
 		if err != nil {
 			render500(r.w, fmt.Errorf("unable to write enrollment data to database: %s", err), pageVars)
 			return
 		}
 		audit.Log(r.user, audit.ActionAssociateStudent, msg)
-
 		render(r.hh.successTemplate, r.w, pageVars)
 		return
 	}
 
-	// No-go, re-render the form
-	msg += "; FAILURE: " + f.errorString()
+	// No valid "confirm" value, so we need to render the confirmation page
+	msg += "; requesting confirmation"
 	audit.Log(r.user, audit.ActionAssociateStudent, msg)
-	pageVars.Alert = fmt.Sprintf("The following errors prevented associating %q with CRN %q: %s",
-		f.DuckID, f.CRN, f.errorString())
-	render(r.hh.formTemplate, r.w, pageVars)
+	render(r.hh.confirmTemplate, r.w, pageVars)
 }
 
 // serveForm has no logic to handle, just a form to render

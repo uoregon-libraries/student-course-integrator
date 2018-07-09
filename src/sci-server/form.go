@@ -16,12 +16,14 @@ type form struct {
 	User    *user.User
 	Course  *course.Course
 	Student *person.Person
+	Confirm string
 	errors  []error
 }
 
 func (r *response) getForm() (f form, err error) {
 	f.CRN = r.req.PostFormValue("crn")
 	f.DuckID = r.req.PostFormValue("duckid")
+	f.Confirm = r.req.PostFormValue("confirm")
 	f.User = r.user
 
 	if f.DuckID == "" {

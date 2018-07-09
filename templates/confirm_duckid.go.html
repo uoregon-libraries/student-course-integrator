@@ -1,0 +1,18 @@
+{{block "metatitle" .}}Confirmation - Canvas Student Integrator{{end}}
+{{block "title" .}}<h1>Confirmation</h1>{{end}}
+
+{{block "content" .}}
+
+<div>
+  You're about to add {{.Form.DuckID}} ({{.Form.Student.DisplayName}}) to
+  course {{.Form.CRN}} ({{.Form.Course.Description}}).  If this is correct,
+  please choose "confirm" below.
+</div>
+
+<form id="association-form" method="POST" action="{{FullPath ""}}">
+  <input type="hidden" name="duckid" id="duckid" value="{{.Form.DuckID}}"/>
+  <input type="hidden" name="crn" id="crn" value="{{.Form.CRN}}" />
+  <button type="submit" name="confirm" value="1" class="prevent-double-click">Confirm</button>
+  <button type="submit" name="confirm" value="0" class="prevent-double-click">Choose a different duckid</button>
+</form>
+{{end}}
