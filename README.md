@@ -11,7 +11,7 @@ Settings file
 
 Copy example.conf to sci.conf and modify it as needed.  SCI will look for this
 file at `/etc/sci.conf`, then `./sci.conf`.  You can pass the `-c` flag to
-specify a custom location as well, e.g., `./bin/sci-server -c /tmp/dummysettings.conf`.
+specify a custom location as well, e.g., `./bin/sci server -c /tmp/dummysettings.conf`.
 
 All settings can be overridden with environment variables prefixed with "SCI_".
 In production, use this to avoid storing sensitive values in `sci.conf`:
@@ -58,7 +58,7 @@ Run the server
 ---
 
 ```bash
-./bin/sci-server
+./bin/sci server
 ```
 
 Development

@@ -10,6 +10,6 @@ fi
 
 make -e
 if [[ $? == 0 ]]; then
-  ./bin/sci-server &
+  ./bin/sci server &
   echo $! > /tmp/sci-pid
 fi
