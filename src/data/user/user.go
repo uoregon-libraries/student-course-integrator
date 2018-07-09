@@ -69,13 +69,14 @@ func (u *User) readDB() error {
 	return nil
 }
 
-// HasCourse returns true if the user has the given course in her Courses list
-func (u *User) HasCourse(crn string) bool {
+// FindCourse returns the course if the user has the given course in her
+// Courses list, otherwise it returns nil
+func (u *User) FindCourse(crn string) *course.Course {
 	for _, c := range u.Courses {
 		if c.CRN == crn {
-			return true
+			return c
 		}
 	}
 
-	return false
+	return nil
 }

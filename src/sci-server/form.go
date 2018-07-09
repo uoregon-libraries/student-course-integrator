@@ -4,6 +4,7 @@ import (
 	"errors"
 	"strings"
 
+	"github.com/uoregon-libraries/student-course-integrator/src/data/course"
 	"github.com/uoregon-libraries/student-course-integrator/src/data/user"
 	"github.com/uoregon-libraries/student-course-integrator/src/person"
 )
@@ -13,6 +14,7 @@ type form struct {
 	CRN     string
 	DuckID  string
 	User    *user.User
+	Course  *course.Course
 	Student *person.Person
 	errors  []error
 }
@@ -46,7 +48,8 @@ func (r *response) getForm() (f form, err error) {
 	}
 
 	// Make sure the logged-in user is allowed to assign people to this crn
-	if !f.User.HasCourse(f.CRN) {
+	f.Course = f.User.FindCourse(f.CRN)
+	if f.Course == nil {
 		f.errors = append(f.errors, errors.New("the chosen course is invalid"))
 	}
 
