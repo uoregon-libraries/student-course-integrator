@@ -20,19 +20,38 @@ import (
 	"github.com/uoregon-libraries/student-course-integrator/src/sci-server"
 )
 
-var cmdMap = map[string]func(){
-	"server":     sciserver.Run,
-	"import-csv": importcsv.Run,
+type command struct {
+	desc string
+	run  func()
+}
+
+var cmdMap = map[string]command{
+	"server": {
+		desc: "Backoffice web server which faculty log into in order to associate students with courses",
+		run:  sciserver.Run,
+	},
+	"import-csv": {
+		desc: "CSV importer for populating the database with courses and faculty",
+		run:  importcsv.Run,
+	},
 }
 
 func usageErr(e string) {
 	fmt.Fprintf(os.Stderr, "%s\n\nUsage: sci <subcommand>\n\n", e)
-	var commands []string
+	var keys []string
+	var maxlen int
 	for key, _ := range cmdMap {
-		commands = append(commands, key)
+		keys = append(keys, key)
+		if len(key) > maxlen {
+			maxlen = len(key)
+		}
 	}
-	sort.Strings(commands)
-	fmt.Fprintf(os.Stderr, "Valid subcommands: %s\n", strings.Join(commands, ","))
+	sort.Strings(keys)
+	fmt.Fprintf(os.Stderr, "Valid subcommands:\n")
+	for _, key := range keys {
+		var cmd = cmdMap[key]
+		fmt.Fprintf(os.Stderr, "  - %s%s: %s\n", key, strings.Repeat(" ", maxlen - len(key)), cmd.desc)
+	}
 	os.Exit(1)
 }
 
@@ -41,14 +60,14 @@ func main() {
 		usageErr("You must specify a subcommand")
 	}
 
-	var fn, ok = cmdMap[os.Args[1]]
+	var cmd, ok = cmdMap[os.Args[1]]
 	if !ok {
 		usageErr(fmt.Sprintf("%q is not a valid subcommand", os.Args[1]))
 	}
 
 	os.Args = append([]string{os.Args[0]}, os.Args[2:]...)
 	getConf()
-	fn()
+	cmd.run()
 }
 
 func getConf() {
