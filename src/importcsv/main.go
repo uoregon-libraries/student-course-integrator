@@ -75,6 +75,7 @@ func buildData(op *magicsql.Operation, courses, enrollments [][]string) error {
 		if !ok {
 			return fmt.Errorf("enrollments: record %d's course id (%s) is unknown")
 		}
+		// TODO: Ping service to get duckid
 		st.Exec(userID, courseDBID)
 	}
 
