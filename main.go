@@ -37,7 +37,7 @@ var cmdMap = map[string]command{
 }
 
 func usageErr(e string) {
-	fmt.Fprintf(os.Stderr, "%s\n\nUsage: sci <subcommand>\n\n", e)
+	fmt.Fprintf(os.Stderr, "\x1b[31;1m%s\x1b[0m\n\nUsage: sci <subcommand>\n\n", e)
 	var keys []string
 	var maxlen int
 	for key, _ := range cmdMap {
