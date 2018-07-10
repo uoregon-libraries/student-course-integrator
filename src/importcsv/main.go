@@ -9,6 +9,7 @@ import (
 	"github.com/Nerdmaster/magicsql"
 	"github.com/uoregon-libraries/gopkg/logger"
 	"github.com/uoregon-libraries/student-course-integrator/src/global"
+	"github.com/uoregon-libraries/student-course-integrator/src/translator"
 )
 
 func Run() {
@@ -59,7 +60,10 @@ func buildData(op *magicsql.Operation, courses, enrollments [][]string) error {
 	op.Exec("DELETE FROM faculty_courses")
 	st = op.Prepare("INSERT INTO faculty_courses (login, course_id) VALUES (?, ?)")
 
+	// duckidMap reduces API hits by storing duckids for previously-seen university ids
+	var duckidMap = make(map[string]string)
 	expectedLen = 5
+
 	for i, record := range enrollments {
 		if len(record) != expectedLen {
 			return fmt.Errorf("enrollments.csv: record %d doesn't have %d columns", i, expectedLen)
@@ -75,8 +79,18 @@ func buildData(op *magicsql.Operation, courses, enrollments [][]string) error {
 		if !ok {
 			return fmt.Errorf("enrollments: record %d's course id (%s) is unknown")
 		}
-		// TODO: Ping service to get duckid
-		st.Exec(userID, courseDBID)
+
+		var duckid string
+		duckid, ok = duckidMap[userID]
+		if !ok {
+			var err error
+			duckid, err = translator.UniversityIDToDuckID(userID)
+			if err != nil {
+				return fmt.Errorf("unable to look up duckid for %s: %s", userID, err)
+			}
+			duckidMap[userID] = duckid
+		}
+		st.Exec(duckid, courseDBID)
 	}
 
 	return nil
