@@ -1,6 +1,7 @@
 module github.com/uoregon-libraries/student-course-integrator
 
 require (
+	github.com/Nerdmaster/magicsql v0.10.1
 	github.com/go-sql-driver/mysql v1.4.0
 	github.com/gorilla/mux v1.6.2
 	github.com/gorilla/sessions v1.1.1
