@@ -8,6 +8,7 @@ if [[ -f /tmp/sci-pid ]]; then
   rm /tmp/sci-pid
 fi
 
+export INSTALL=1
 make -e
 if [[ $? == 0 ]]; then
   ./bin/sci server &
