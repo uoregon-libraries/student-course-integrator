@@ -20,7 +20,10 @@ import (
 	"github.com/uoregon-libraries/student-course-integrator/src/sci-server"
 )
 
-var cmdMap = map[string]func(){"server": sciserver.Run}
+var cmdMap = map[string]func(){
+	"server":     sciserver.Run,
+	"import-csv": importcsv.Run,
+}
 
 func usageErr(e string) {
 	fmt.Fprintf(os.Stderr, "%s\n\nUsage: sci <subcommand>\n\n", e)
