@@ -1,38 +1,42 @@
 {{define "layout"}}
 <!DOCTYPE html>
 <html lang="en">
+
   <head>
     <title>{{block "metatitle" .}}Canvas Student Integrator{{end}}</title>
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+    {{RawCSS "bootstrap/css/bootstrap.min.css"}}
+    {{IncludeCSS "a11y"}}
   </head>
 
   <body>
-    <div>Logged in as {{.User.Login}}</div>
+    <div class="container" id="main">
+      {{if Debug }}
+        <div class="alert alert-warning">
+          Warning: This site is in DEBUG mode and is <strong>NOT SAFE</strong> for production
+        </div>
+      {{end}}
 
-    {{if Debug }}
-      <div class="alert alert-warning">
-        Warning: This site is in DEBUG mode and is <strong>NOT SAFE</strong> for production
-      </div>
-    {{end}}
+      {{block "title" .}}<h1>Canvas Student Integrator</h1>{{end}}
 
-    {{block "title" .}}<h1>Canvas Student Integrator</h1>{{end}}
+      {{- if .Alert}}
+        <div class="alert alert-danger">
+          <p>{{.Alert}}</p>
+        </div>
+      {{- end}}
+      {{- if .Info}}
+        <div class="alert alert-info">
+          <p>{{.Info}}</p>
+        </div>
+      {{- end}}
 
-    {{- if .Alert}}
-      <div class="alert alert-danger">
-        <p>{{.Alert}}</p>
-      </div>
-    {{- end}}
-    {{- if .Info}}
-      <div class="alert alert-info">
-        <p>{{.Info}}</p>
-      </div>
-    {{- end}}
-
-    {{block "content" .}}{{end}}
+      {{block "content" .}}{{end}}
+    </div>
 
     {{IncludeJS "prevent_double_submit"}}
+    {{RawJS "bootstrap/js/bootstrap.min.js"}}
     {{block "extrajs" .}}{{end}}
   </body>
 </html>
