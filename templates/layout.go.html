@@ -8,10 +8,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
     {{RawCSS "bootstrap/css/bootstrap.min.css"}}
+    {{IncludeCSS "header"}}
     {{IncludeCSS "a11y"}}
+    {{IncludeCSS "style"}}
   </head>
 
   <body>
+    <div id="uo-topbar">
+      <div class="container">
+        <a href="https://library.uoregon.edu/" rel="home" id="uolib-logo">
+          <img src="{{ImageURL "libraries.svg"}}" alt="University of Oregon Libraries" />
+        </a>
+        <div class="pull-right userlogin">Logged in as {{.User.Login}}</div>
+      </div>
+    </div>
+
     <div class="container" id="main">
       {{if Debug }}
         <div class="alert alert-warning">
