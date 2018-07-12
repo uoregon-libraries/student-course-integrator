@@ -20,11 +20,12 @@ type form struct {
 	errors  []error
 }
 
-func (r *response) getForm() (f form, err error) {
+func (r *responder) getForm() (f *form, err error) {
+	f = r.vars.Form
 	f.CRN = r.req.PostFormValue("crn")
 	f.DuckID = r.req.PostFormValue("duckid")
 	f.Confirm = r.req.PostFormValue("confirm")
-	f.User = r.user
+	f.User = r.vars.User
 
 	if f.DuckID == "" {
 		f.errors = append(f.errors, errors.New("duckid must be filled out"))

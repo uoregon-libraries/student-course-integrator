@@ -10,20 +10,11 @@ import (
 	"github.com/uoregon-libraries/student-course-integrator/src/data/user"
 )
 
-type commonVars struct {
+type homeVars struct {
 	Alert string
 	Info  string
 	User  *user.User
-}
-
-// SetAlert implements alertable for the template rendering function
-func (v *commonVars) SetAlert(val string) {
-	v.Alert = val
-}
-
-type homeVars struct {
-	commonVars
-	Form form
+	Form  *form
 }
 
 // homeHandler encapsulates basic data and functionality for handling input and
@@ -32,15 +23,6 @@ type homeHandler struct {
 	formTemplate    *tmpl.Template
 	confirmTemplate *tmpl.Template
 	successTemplate *tmpl.Template
-}
-
-// response wraps the writer and request to provide us a simpler approach to
-// handling whatever we need to send the client
-type response struct {
-	w    http.ResponseWriter
-	req  *http.Request
-	user *user.User
-	hh   *homeHandler
 }
 
 func hHome() *homeHandler {
@@ -54,8 +36,7 @@ func hHome() *homeHandler {
 
 // ServeHTTP implements http.Handler for homeHandler
 func (h *homeHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
-	var user = getContextUser(req)
-	var r = &response{w, req, user, h}
+	var r = respond(w, req, h)
 	if req.Method == "POST" {
 		r.processSubmission()
 		return
@@ -63,31 +44,29 @@ func (h *homeHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	r.serveForm()
 }
 
-func (r *response) processSubmission() {
-	var pageVars = &homeVars{commonVars: commonVars{User: r.user}}
+func (r *responder) processSubmission() {
 	var f, err = r.getForm()
 	if err != nil {
-		render500(r.w, fmt.Errorf("unable to instantiate form data: %s", err), pageVars)
+		r.render500(fmt.Errorf("unable to instantiate form data: %s", err))
 		return
 	}
 
-	pageVars.Form = f
 	var msg = fmt.Sprintf("student %q -> course %q", f.DuckID, f.CRN)
 
 	// Explicit rejection of duckid was requested: re-render the form
 	if f.Confirm == "0" {
 		msg += "; wrong duckid, re-rendering form"
-		audit.Log(r.user, audit.ActionAssociateStudent, msg)
-		render(r.hh.formTemplate, r.w, pageVars)
+		audit.Log(r.vars.User, audit.ActionAssociateStudent, msg)
+		r.render(r.hh.formTemplate)
 		return
 	}
 
 	// Errors: re-render the form
 	if len(f.errors) > 0 {
 		msg += "; FAILURE: " + f.errorString()
-		audit.Log(r.user, audit.ActionAssociateStudent, msg)
-		pageVars.Alert = fmt.Sprintf("Error: %s", f.errorString())
-		render(r.hh.formTemplate, r.w, pageVars)
+		audit.Log(r.vars.User, audit.ActionAssociateStudent, msg)
+		r.vars.Alert = fmt.Sprintf("Error: %s", f.errorString())
+		r.render(r.hh.formTemplate)
 		return
 	}
 
@@ -96,21 +75,21 @@ func (r *response) processSubmission() {
 		msg += "; CONFIRMED"
 		err = enrollment.AddGTF(f.CRN, f.Student.UniversityID)
 		if err != nil {
-			render500(r.w, fmt.Errorf("unable to write enrollment data to database: %s", err), pageVars)
+			r.render500(fmt.Errorf("unable to write enrollment data to database: %s", err))
 			return
 		}
-		audit.Log(r.user, audit.ActionAssociateStudent, msg)
-		render(r.hh.successTemplate, r.w, pageVars)
+		audit.Log(r.vars.User, audit.ActionAssociateStudent, msg)
+		r.render(r.hh.successTemplate)
 		return
 	}
 
 	// No valid "confirm" value, so we need to render the confirmation page
 	msg += "; requesting confirmation"
-	audit.Log(r.user, audit.ActionAssociateStudent, msg)
-	render(r.hh.confirmTemplate, r.w, pageVars)
+	audit.Log(r.vars.User, audit.ActionAssociateStudent, msg)
+	r.render(r.hh.confirmTemplate)
 }
 
 // serveForm has no logic to handle, just a form to render
-func (r *response) serveForm() {
-	render(r.hh.formTemplate, r.w, &homeVars{commonVars: commonVars{User: r.user}})
+func (r *responder) serveForm() {
+	r.render(r.hh.formTemplate)
 }

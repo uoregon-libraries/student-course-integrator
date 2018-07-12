@@ -115,7 +115,8 @@ func getUser(next http.Handler) http.Handler {
 		var user, err = findUser(req)
 		if err != nil {
 			logger.Criticalf("Database error trying to look up user: %s", err)
-			render500(w, err, &commonVars{})
+			var r = &responder{w: w, vars: &homeVars{}}
+			r.render500(err)
 			return
 		}
 		context.Set(req, "user", user)
@@ -130,7 +131,7 @@ func mustAuth(next http.Handler) http.Handler {
 		var user = getContextUser(req)
 		if !user.Authorized {
 			w.WriteHeader(http.StatusForbidden)
-			insufficientPrivileges.Execute(w, &commonVars{User: user})
+			insufficientPrivileges.Execute(w, &homeVars{User: user})
 			return
 		}
 		next.ServeHTTP(w, req)
