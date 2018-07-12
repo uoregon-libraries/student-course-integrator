@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/uoregon-libraries/gopkg/tmpl"
+	"github.com/uoregon-libraries/gopkg/webutil"
 	"github.com/uoregon-libraries/student-course-integrator/src/data/audit"
 	"github.com/uoregon-libraries/student-course-integrator/src/data/enrollment"
 	"github.com/uoregon-libraries/student-course-integrator/src/data/user"
@@ -22,7 +23,6 @@ type homeVars struct {
 type homeHandler struct {
 	formTemplate    *tmpl.Template
 	confirmTemplate *tmpl.Template
-	successTemplate *tmpl.Template
 }
 
 func hHome() *homeHandler {
@@ -30,7 +30,6 @@ func hHome() *homeHandler {
 	return &homeHandler{
 		formTemplate:    r.MustBuild("home.go.html"),
 		confirmTemplate: r.MustBuild("confirm_duckid.go.html"),
-		successTemplate: r.MustBuild("enroll_success.go.html"),
 	}
 }
 
@@ -79,7 +78,10 @@ func (r *responder) processSubmission() {
 			return
 		}
 		audit.Log(r.vars.User, audit.ActionAssociateStudent, msg)
-		r.render(r.hh.successTemplate)
+		var s = getSession(r.w, r.req)
+		s.SetInfoFlash(fmt.Sprintf(`%s (%s) added to %s (%s)`,
+			f.Student.DisplayName, f.Student.DuckID, f.Course.Description, f.CRN))
+		http.Redirect(r.w, r.req, webutil.FullPath(""), http.StatusFound)
 		return
 	}
 
