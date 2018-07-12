@@ -86,8 +86,7 @@ func (r *response) processSubmission() {
 	if len(f.errors) > 0 {
 		msg += "; FAILURE: " + f.errorString()
 		audit.Log(r.user, audit.ActionAssociateStudent, msg)
-		pageVars.Alert = fmt.Sprintf("The following errors prevented associating %q with CRN %q: %s",
-			f.DuckID, f.CRN, f.errorString())
+		pageVars.Alert = fmt.Sprintf("Error: %s", f.errorString())
 		render(r.hh.formTemplate, r.w, pageVars)
 		return
 	}
