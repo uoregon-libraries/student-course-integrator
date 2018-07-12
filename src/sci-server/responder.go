@@ -18,7 +18,13 @@ type responder struct {
 
 func respond(w http.ResponseWriter, req *http.Request, hh *homeHandler) *responder {
 	var user = getContextUser(req)
-	return &responder{w: w, req: req, hh: hh, vars: &homeVars{User: user, Form: &form{}}}
+	var r = &responder{w: w, req: req, hh: hh, vars: &homeVars{User: user, Form: &form{}}}
+
+	var s = getSession(w, req)
+	r.vars.Info = s.GetInfoFlash()
+	r.vars.Alert = s.GetAlertFlash()
+
+	return r
 }
 
 func (r *responder) render(t *tmpl.Template) {
