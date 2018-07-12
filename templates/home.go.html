@@ -4,22 +4,31 @@
 {{block "content" .}}
 
 <form id="association-form" method="POST" action="{{FullPath ""}}">
-  <label>
-  <p>Duck ID:</p>
-  <input name="duckid" id="duckid" value="{{.Form.DuckID}}"/>
-  </label>
+  <div class="form-group row">
+    <label for="duckid" class="col-sm-2 col-form-label">Duck ID:</label>
+    <div class="col-sm-10">
+      <input class="form-control" name="duckid" id="duckid" value="{{.Form.DuckID}}"/>
+    </div>
+  </div>
 
-  <label>
-  <p>Course</p>
-  <select name="crn" id="crn">
-    <option value="">Select a course</option>
-  {{range .User.Courses}}
-    <option value="{{.CRN}}" {{if eq .CRN $.Form.CRN}}selected {{end}}>{{.Description}}</option>
-  {{end}}
-  </select>
-  </label>
+  <div class="form-group row">
+    <label for="crn" class="col-sm-2 col-form-label">Course</label>
+    <div class="col-sm-10">
+      <select class="form-control" name="crn" id="crn">
+        <option value="">Select a course</option>
+      {{range .User.Courses}}
+        <option value="{{.CRN}}" {{if eq .CRN $.Form.CRN}}selected {{end}}>{{.Description}}</option>
+      {{end}}
+      </select>
+    </div>
+  </div>
 
-  <button type="submit" class="prevent-double-click">Submit</button>
+  <div class="form-group row">
+    <div class="col-sm-10 offset-sm-2">
+      <button type="submit" class="btn btn-primary">Submit</button>
+    </div>
+  </div>
+
 </form>
 
 {{end}}
