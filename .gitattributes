@@ -1,3 +1,4 @@
+*.go diff=golang
 static/bootstrap/* linguist-vendored
 static/bootstrap/js/* linguist-vendored
 static/bootstrap/css/* linguist-vendored
