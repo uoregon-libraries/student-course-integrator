@@ -40,3 +40,36 @@ func (s *session) SetString(key, val string) {
 		logger.Errorf("Unable to save session data: %s", err)
 	}
 }
+
+func (s *session) getFlash(key string) string {
+	var data = s.s.Flashes(key)
+	if len(data) > 0 {
+		if str, ok := data[0].(string); ok {
+			s.s.Save(s.req, s.w)
+			return str
+		}
+	}
+
+	return ""
+}
+
+func (s *session) setFlash(key, val string) {
+	s.s.AddFlash(val, key)
+	s.s.Save(s.req, s.w)
+}
+
+func (s *session) GetInfoFlash() string {
+	return s.getFlash("info")
+}
+
+func (s *session) SetInfoFlash(val string) {
+	s.setFlash("info", val)
+}
+
+func (s *session) GetAlertFlash() string {
+	return s.getFlash("alert")
+}
+
+func (s *session) SetAlertFlash(val string) {
+	s.setFlash("alert", val)
+}

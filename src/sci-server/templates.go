@@ -1,9 +1,6 @@
 package sciserver
 
 import (
-	"net/http"
-
-	"github.com/uoregon-libraries/gopkg/logger"
 	"github.com/uoregon-libraries/gopkg/tmpl"
 	"github.com/uoregon-libraries/gopkg/webutil"
 	"github.com/uoregon-libraries/student-course-integrator/src/version"
@@ -37,28 +34,4 @@ func initRootTemplates(templatePath string, debug bool) {
 	layout.MustReadPartials("layout.go.html")
 	insufficientPrivileges = layout.MustBuild("insufficient-privileges.go.html")
 	empty = layout.MustBuild("empty.go.html")
-}
-
-type alertable interface {
-	SetAlert(string)
-}
-
-func render(t *tmpl.Template, w http.ResponseWriter, data alertable) {
-	var err = t.BufferedExecute(w, data)
-	if err == nil {
-		return
-	}
-
-	logger.Errorf("Error serving %q: %s", t.Name, err)
-	render500(w, err, data)
-}
-
-func render500(w http.ResponseWriter, err error, data alertable) {
-	w.WriteHeader(500)
-	data.SetAlert("Server error encountered.  Try again or contact support.")
-	logger.Errorf("Server error: %s", err)
-	err = empty.Execute(w, data)
-	if err != nil {
-		logger.Criticalf("Error rendering error page: %s", err)
-	}
 }
