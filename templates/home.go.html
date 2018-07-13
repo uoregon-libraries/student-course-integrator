@@ -1,34 +1,50 @@
 {{block "metatitle" .}}Add Student - Canvas Student Integrator{{end}}
-{{block "title" .}}<h1>Add Student</h1>{{end}}
+{{block "title" .}}<!-- 0x90 -->{{end}}
 
 {{block "content" .}}
 
-<form id="association-form" method="POST">
-  <div class="form-group row">
-    <label for="duckid" class="col-sm-2 col-form-label">Duck ID:</label>
-    <div class="col-sm-10">
-      <input class="form-control" name="duckid" id="duckid" value="{{.Form.DuckID}}"/>
+<div class="card">
+  <div class="card-body">
+    <h1 class="card-title">Add a student to a course</h1>
+    <div id="form-info" class="card-text">
+      Choose a course and enter a duckid to associate a GTF.  The process which
+      sends GTFs into canvas only runs once a day, so you may have to wait up to 24
+      hours for your form submission to take effect.
+      <p /><p />
+      Note that you may associate a GTF to the same course multiple times and the
+      import will still function properly.  If you aren't sure if you've entered
+      somebody, there's no risk in entering them again.
     </div>
-  </div>
+  </div><!-- /card-body -->
 
-  <div class="form-group row">
-    <label for="crn" class="col-sm-2 col-form-label">Course</label>
-    <div class="col-sm-10">
-      <select class="form-control" name="crn" id="crn">
-        <option value="">Select a course</option>
-      {{range .User.Courses}}
-        <option value="{{.CRN}}" {{if eq .CRN $.Form.CRN}}selected {{end}}>{{.Description}}</option>
-      {{end}}
-      </select>
-    </div>
-  </div>
+  <div class="card-body">
+    <form id="association-form" method="POST">
+      <div class="form-group row">
+        <label for="duckid" class="col-sm-2 col-form-label">Duck ID:</label>
+        <div class="col-sm-10">
+          <input class="form-control" name="duckid" id="duckid" value="{{.Form.DuckID}}"/>
+        </div>
+      </div>
 
-  <div class="form-group row">
-    <div class="col-sm-10 offset-sm-2">
-      <button type="submit" class="btn btn-primary">Submit</button>
-    </div>
-  </div>
+      <div class="form-group row">
+        <label for="crn" class="col-sm-2 col-form-label">Course</label>
+        <div class="col-sm-10">
+          <select class="form-control" name="crn" id="crn">
+            <option value="">Select a course</option>
+          {{range .User.Courses}}
+            <option value="{{.CRN}}" {{if eq .CRN $.Form.CRN}}selected {{end}}>{{.Description}}</option>
+          {{end}}
+          </select>
+        </div>
+      </div>
 
-</form>
+      <div class="form-group row">
+        <div class="col-sm-10 offset-sm-2">
+          <button type="submit" class="btn btn-primary">Submit</button>
+        </div>
+      </div>
+    </form>
+  </div><!-- /card-body -->
+</div><!-- /card -->
 
 {{end}}
