@@ -12,6 +12,7 @@ import (
 	"github.com/uoregon-libraries/student-course-integrator/src/translator"
 )
 
+// Run implements the CSV import for our main multi-binary
 func Run() {
 	var courses = readCSV("courses.csv")
 	var enrollments = readCSV("enrollments.csv")
@@ -77,7 +78,7 @@ func buildData(op *magicsql.Operation, courses, enrollments [][]string) error {
 
 		var courseDBID, ok = courseMap[courseID]
 		if !ok {
-			return fmt.Errorf("enrollments: record %d's course id (%s) is unknown")
+			return fmt.Errorf("enrollments: record %d's course id (%s) is unknown", i, courseID)
 		}
 
 		var duckid string

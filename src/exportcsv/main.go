@@ -12,6 +12,7 @@ import (
 	"github.com/uoregon-libraries/student-course-integrator/src/global"
 )
 
+// Run implements the CSV export for our main multi-binary
 func Run() {
 	var csvPath = global.Conf.CanvasCSVPath
 	var fname = fmt.Sprintf("enrollments-%s.csv", time.Now().Format("2006-01-02"))
