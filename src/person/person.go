@@ -13,7 +13,7 @@ import (
 // local database; we query LDAP and a custom duckid-to-95x endpoint to get the
 // data we need to populate this structure.
 type Person struct {
-	UniversityID string // "95 number"
+	BannerID     string // "95 number"
 	DuckID       string
 	Affiliations []string
 	DisplayName  string
@@ -35,9 +35,9 @@ func FindByDuckID(duckid string) (*Person, error) {
 	}
 
 	if p != nil {
-		p.UniversityID, err = translator.DuckIDToUniversityID(p.DuckID)
+		p.BannerID, err = translator.DuckIDToBannerID(p.DuckID)
 		if err != nil {
-			return nil, fmt.Errorf("unable to look up university id for duckid %s: %s", p.DuckID, err)
+			return nil, fmt.Errorf("unable to look up Banner ID for duckid %s: %s", p.DuckID, err)
 		}
 	}
 	return p, nil

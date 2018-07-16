@@ -5,9 +5,9 @@ import (
 	"time"
 )
 
-// DuckIDToUniversityID returns the university id (95 number) for the given
+// DuckIDToBannerID returns the banner id (95 number) for the given
 // duckid, or an error if the service can't be reached to do the lookup
-func DuckIDToUniversityID(duckid string) (string, error) {
+func DuckIDToBannerID(duckid string) (string, error) {
 	// Simulate the cost of an API hit
 	time.Sleep(time.Millisecond * 50)
 
@@ -16,9 +16,9 @@ func DuckIDToUniversityID(duckid string) (string, error) {
 	return ids[i], nil
 }
 
-// UniversityIDToDuckID returns the duckid for the given university id (95
+// BannerIDToDuckID returns the duckid for the given banner id (95
 // number), or an error if the service can't be reached to do the lookup
-func UniversityIDToDuckID(uid string) (string, error) {
+func BannerIDToDuckID(uid string) (string, error) {
 	// Simulate the cost of an API hit
 	time.Sleep(time.Millisecond * 50)
 
