@@ -45,7 +45,7 @@ func usageErr(e string) {
 	fmt.Fprintf(os.Stderr, "\x1b[31;1m%s\x1b[0m\n\nUsage: sci <subcommand>\n\n", e)
 	var keys []string
 	var maxlen int
-	for key, _ := range cmdMap {
+	for key := range cmdMap {
 		keys = append(keys, key)
 		if len(key) > maxlen {
 			maxlen = len(key)
@@ -55,7 +55,7 @@ func usageErr(e string) {
 	fmt.Fprintf(os.Stderr, "Valid subcommands:\n")
 	for _, key := range keys {
 		var cmd = cmdMap[key]
-		fmt.Fprintf(os.Stderr, "  - %s%s: %s\n", key, strings.Repeat(" ", maxlen - len(key)), cmd.desc)
+		fmt.Fprintf(os.Stderr, "  - %s%s: %s\n", key, strings.Repeat(" ", maxlen-len(key)), cmd.desc)
 	}
 	os.Exit(1)
 }
