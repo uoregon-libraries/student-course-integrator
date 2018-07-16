@@ -78,7 +78,7 @@ func buildData(op *magicsql.Operation, courses, enrollments [][]string) error {
 
 		var courseDBID, ok = courseMap[courseID]
 		if !ok {
-			return fmt.Errorf("enrollments: record %d's course id (%s) is unknown")
+			return fmt.Errorf("enrollments: record %d's course id (%s) is unknown", i, courseID)
 		}
 
 		var duckid string
