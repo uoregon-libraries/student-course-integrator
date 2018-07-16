@@ -16,4 +16,5 @@ jobs:
       - run: go get -u golang.org/x/vgo
       - run: go get -u github.com/golang/lint/golint
       - run: make
+      - run: make validate
       - run: make test
