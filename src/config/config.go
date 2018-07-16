@@ -18,7 +18,8 @@ type Config struct {
 	LDAPUser        string `setting:"LDAP_BIND_USER"`
 	LDAPPass        string `setting:"LDAP_BIND_PASS"`
 	LDAPBaseDN      string `setting:"LDAP_BASE_DN"`
-	CSVPath         string `setting:"CSV_PATH" type:"path"`
+	BannerCSVPath   string `setting:"BANNER_CSV_PATH" type:"path"`
+	CanvasCSVPath   string `setting:"CANVAS_CSV_PATH" type:"path"`
 }
 
 // Parse reads the given settings file and returns a parsed Config.  File paths

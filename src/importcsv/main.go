@@ -97,7 +97,7 @@ func buildData(op *magicsql.Operation, courses, enrollments [][]string) error {
 }
 
 func readCSV(fname string) (records [][]string) {
-	var csvPath = global.Conf.CSVPath
+	var csvPath = global.Conf.BannerCSVPath
 	var f, err = os.Open(filepath.Join(csvPath, fname))
 	if err != nil {
 		logger.Fatalf("Unable to open %q: %s", fname, err)
