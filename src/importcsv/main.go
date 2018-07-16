@@ -12,6 +12,7 @@ import (
 	"github.com/uoregon-libraries/student-course-integrator/src/translator"
 )
 
+// Run implements the CSV import for our main multi-binary
 func Run() {
 	var courses = readCSV("courses.csv")
 	var enrollments = readCSV("enrollments.csv")
