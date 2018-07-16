@@ -15,6 +15,7 @@ import (
 	"github.com/uoregon-libraries/gopkg/fileutil"
 	"github.com/uoregon-libraries/gopkg/logger"
 	"github.com/uoregon-libraries/student-course-integrator/src/config"
+	"github.com/uoregon-libraries/student-course-integrator/src/exportcsv"
 	"github.com/uoregon-libraries/student-course-integrator/src/global"
 	"github.com/uoregon-libraries/student-course-integrator/src/importcsv"
 	"github.com/uoregon-libraries/student-course-integrator/src/sci-server"
@@ -33,6 +34,10 @@ var cmdMap = map[string]command{
 	"import-csv": {
 		desc: "CSV importer for populating the database with courses and faculty",
 		run:  importcsv.Run,
+	},
+	"export-csv": {
+		desc: "CSV exporter for sending list of GTFs out to canvas",
+		run:  exportcsv.Run,
 	},
 }
 
