@@ -66,7 +66,7 @@ func callService(lookup lookupType, val string) (user userJSON, err error) {
 	}
 
 	if r.StatusCode != 200 {
-		return user, fmt.Errorf("translator: service returned non-success status code %d and message %q", r.StatusCode, r.Message)
+		return user, fmt.Errorf("translator: service error (%q; status code %d)", r.Message, r.StatusCode)
 	}
 
 	user = r.User
