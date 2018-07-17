@@ -34,6 +34,12 @@ type userJSON struct {
 	DuckID   string `json:"duckid"`
 }
 
+type responseJSON struct {
+	User       userJSON `json:"result"`
+	Message    string   `json:"message"`
+	StatusCode int      `json:"statusCode"`
+}
+
 // lookupTypes represent the operation when calling the IS service
 type lookupType string
 
@@ -52,9 +58,21 @@ func callService(lookup lookupType, val string) (user userJSON, err error) {
 	var content []byte
 	var url = global.Conf.TranslatorHost + "/" + path.Join(string(lookup), val)
 	content, err = get(url)
-	if err == nil {
-		err = json.Unmarshal(content, &user)
+	if err != nil {
+		return user, err
 	}
+
+	var r responseJSON
+	err = json.Unmarshal(content, &r)
+	if err != nil {
+		return user, err
+	}
+
+	if r.StatusCode != 200 {
+		return user, fmt.Errorf("translator: service returned non-success status code %d and message %q", r.StatusCode, r.Message)
+	}
+
+	user = r.User
 	if user.BannerID == "" || user.DuckID == "" {
 		return user, fmt.Errorf("invalid response data")
 	}
