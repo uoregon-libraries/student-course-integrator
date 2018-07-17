@@ -15,7 +15,7 @@ func DuckIDToBannerID(duckid string) (string, error) {
 	// Simulate the cost of an API hit
 	time.Sleep(time.Millisecond * 50)
 
-	var u, err = callService(lookupBannerID, duckid)
+	var u, err = callService(lookupByDuckID, duckid)
 	return u.BannerID, err
 }
 
@@ -25,7 +25,7 @@ func BannerIDToDuckID(uid string) (string, error) {
 	// Simulate the cost of an API hit
 	time.Sleep(time.Millisecond * 50)
 
-	var u, err = callService(lookupDuckID, uid)
+	var u, err = callService(lookupByBannerID, uid)
 	return u.DuckID, err
 }
 
@@ -43,20 +43,17 @@ type responseJSON struct {
 // lookupTypes represent the operation when calling the IS service
 type lookupType string
 
-// Valid lookup types - names don't match strings because the name is meant to
-// convey the meaning of what you're requesting, not what you have (and the
-// string is really the API path endpoint, so may not be meaningful as things
-// change anyway)
+// valid lookup types - the value indicates how a person is being looked up
 const (
-	lookupBannerID lookupType = "duckid"    // Look up a banner ID from a given duckid
-	lookupDuckID   lookupType = "banner_id" // Look up a duckid from a given banner ID
+	lookupByDuckID   lookupType = "duckid"
+	lookupByBannerID lookupType = "banner_id"
 )
 
 // callService is a common wrapper to call the central translation service and
 // return a user response.
 func callService(lookup lookupType, val string) (user userJSON, err error) {
 	var content []byte
-	var url = global.Conf.TranslatorHost + "/" + path.Join(string(lookup), val)
+	var url = global.Conf.TranslatorHost + "/" + path.Join("person", string(lookup), val)
 	content, err = get(url)
 	if err != nil {
 		return user, err
