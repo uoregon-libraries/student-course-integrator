@@ -72,7 +72,7 @@ func (r *responder) processSubmission() {
 	// Require "confirm" to be exactly the string "1" so that we err on the side of not adding students
 	if f.Confirm == "1" {
 		msg += "; CONFIRMED"
-		err = enrollment.AddGTF(f.CRN, f.Student.UniversityID)
+		err = enrollment.AddGTF(f.CRN, f.Student.BannerID)
 		if err != nil {
 			r.render500(fmt.Errorf("unable to write enrollment data to database: %s", err))
 			return

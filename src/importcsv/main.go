@@ -61,7 +61,7 @@ func buildData(op *magicsql.Operation, courses, enrollments [][]string) error {
 	op.Exec("DELETE FROM faculty_courses")
 	st = op.Prepare("INSERT INTO faculty_courses (login, course_id) VALUES (?, ?)")
 
-	// duckidMap reduces API hits by storing duckids for previously-seen university ids
+	// duckidMap reduces API hits by storing duckids for previously-seen banner ids
 	var duckidMap = make(map[string]string)
 	expectedLen = 5
 
@@ -85,7 +85,7 @@ func buildData(op *magicsql.Operation, courses, enrollments [][]string) error {
 		duckid, ok = duckidMap[userID]
 		if !ok {
 			var err error
-			duckid, err = translator.UniversityIDToDuckID(userID)
+			duckid, err = translator.BannerIDToDuckID(userID)
 			if err != nil {
 				return fmt.Errorf("unable to look up duckid for %s: %s", userID, err)
 			}

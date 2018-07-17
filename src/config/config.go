@@ -20,6 +20,7 @@ type Config struct {
 	LDAPBaseDN      string `setting:"LDAP_BASE_DN"`
 	BannerCSVPath   string `setting:"BANNER_CSV_PATH" type:"path"`
 	CanvasCSVPath   string `setting:"CANVAS_CSV_PATH" type:"path"`
+	TranslatorHost  string `setting:"TRANSLATOR_HOST" type:"url"`
 }
 
 // Parse reads the given settings file and returns a parsed Config.  File paths

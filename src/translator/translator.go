@@ -1,28 +1,77 @@
 package translator
 
 import (
-	"hash/crc32"
+	"encoding/json"
+	"fmt"
+	"path"
 	"time"
+
+	"github.com/uoregon-libraries/student-course-integrator/src/global"
 )
 
-// DuckIDToUniversityID returns the university id (95 number) for the given
+// DuckIDToBannerID returns the banner id (95 number) for the given
 // duckid, or an error if the service can't be reached to do the lookup
-func DuckIDToUniversityID(duckid string) (string, error) {
+func DuckIDToBannerID(duckid string) (string, error) {
 	// Simulate the cost of an API hit
 	time.Sleep(time.Millisecond * 50)
 
-	var ids = []string{"95x000001", "95x000002", "95x000003", "95x000004", "95x000005"}
-	var i = crc32.ChecksumIEEE([]byte(duckid)) % uint32(len(ids))
-	return ids[i], nil
+	var u, err = callService(lookupByDuckID, duckid)
+	return u.BannerID, err
 }
 
-// UniversityIDToDuckID returns the duckid for the given university id (95
+// BannerIDToDuckID returns the duckid for the given banner id (95
 // number), or an error if the service can't be reached to do the lookup
-func UniversityIDToDuckID(uid string) (string, error) {
+func BannerIDToDuckID(uid string) (string, error) {
 	// Simulate the cost of an API hit
 	time.Sleep(time.Millisecond * 50)
 
-	var ids = []string{"tester1", "tester2", "tester3", "tester4", "tester5"}
-	var i = crc32.ChecksumIEEE([]byte(uid)) % uint32(len(ids))
-	return ids[i], nil
+	var u, err = callService(lookupByBannerID, uid)
+	return u.DuckID, err
+}
+
+type userJSON struct {
+	BannerID string `json:"banner_id"`
+	DuckID   string `json:"duckid"`
+}
+
+type responseJSON struct {
+	User       userJSON `json:"result"`
+	Message    string   `json:"message"`
+	StatusCode int      `json:"statusCode"`
+}
+
+// lookupTypes represent the operation when calling the IS service
+type lookupType string
+
+// valid lookup types - the value indicates how a person is being looked up
+const (
+	lookupByDuckID   lookupType = "duckid"
+	lookupByBannerID lookupType = "banner_id"
+)
+
+// callService is a common wrapper to call the central translation service and
+// return a user response.
+func callService(lookup lookupType, val string) (user userJSON, err error) {
+	var content []byte
+	var url = global.Conf.TranslatorHost + "/" + path.Join("person", string(lookup), val)
+	content, err = get(url)
+	if err != nil {
+		return user, err
+	}
+
+	var r responseJSON
+	err = json.Unmarshal(content, &r)
+	if err != nil {
+		return user, err
+	}
+
+	if r.StatusCode != 200 {
+		return user, fmt.Errorf("translator: service error (%q; status code %d)", r.Message, r.StatusCode)
+	}
+
+	user = r.User
+	if user.BannerID == "" || user.DuckID == "" {
+		return user, fmt.Errorf("invalid response data")
+	}
+	return user, err
 }
