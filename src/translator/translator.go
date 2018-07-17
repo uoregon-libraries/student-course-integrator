@@ -1,8 +1,12 @@
 package translator
 
 import (
-	"hash/crc32"
+	"encoding/json"
+	"fmt"
+	"path"
 	"time"
+
+	"github.com/uoregon-libraries/student-course-integrator/src/global"
 )
 
 // DuckIDToBannerID returns the banner id (95 number) for the given
@@ -11,9 +15,8 @@ func DuckIDToBannerID(duckid string) (string, error) {
 	// Simulate the cost of an API hit
 	time.Sleep(time.Millisecond * 50)
 
-	var ids = []string{"95x000001", "95x000002", "95x000003", "95x000004", "95x000005"}
-	var i = crc32.ChecksumIEEE([]byte(duckid)) % uint32(len(ids))
-	return ids[i], nil
+	var u, err = callService(lookupBannerID, duckid)
+	return u.BannerID, err
 }
 
 // BannerIDToDuckID returns the duckid for the given banner id (95
@@ -22,7 +25,38 @@ func BannerIDToDuckID(uid string) (string, error) {
 	// Simulate the cost of an API hit
 	time.Sleep(time.Millisecond * 50)
 
-	var ids = []string{"tester1", "tester2", "tester3", "tester4", "tester5"}
-	var i = crc32.ChecksumIEEE([]byte(uid)) % uint32(len(ids))
-	return ids[i], nil
+	var u, err = callService(lookupDuckID, uid)
+	return u.DuckID, err
+}
+
+type userJSON struct {
+	BannerID string `json:"banner_id"`
+	DuckID   string `json:"duckid"`
+}
+
+// lookupTypes represent the operation when calling the IS service
+type lookupType string
+
+// Valid lookup types - names don't match strings because the name is meant to
+// convey the meaning of what you're requesting, not what you have (and the
+// string is really the API path endpoint, so may not be meaningful as things
+// change anyway)
+const (
+	lookupBannerID lookupType = "duckid"    // Look up a banner ID from a given duckid
+	lookupDuckID   lookupType = "banner_id" // Look up a duckid from a given banner ID
+)
+
+// callService is a common wrapper to call the central translation service and
+// return a user response.
+func callService(lookup lookupType, val string) (user userJSON, err error) {
+	var content []byte
+	var url = global.Conf.TranslatorHost + "/" + path.Join(string(lookup), val)
+	content, err = get(url)
+	if err == nil {
+		err = json.Unmarshal(content, &user)
+	}
+	if user.BannerID == "" || user.DuckID == "" {
+		return user, fmt.Errorf("invalid response data")
+	}
+	return user, err
 }
