@@ -39,15 +39,15 @@ func (r *responder) getForm() (f *form, err error) {
 		return f, err
 	}
 
-	// Make sure the duckid is valid and represents a GTF
+	// Make sure the duckid is valid and represents somebody who can be a GE
 	f.Student, err = person.FindByDuckID(f.DuckID)
 	if err != nil {
 		return f, err
 	}
 	if f.Student == nil {
-		f.errors = append(f.errors, errors.New("duckid doesn't match a known student"))
-	} else if !f.Student.IsGTF() {
-		f.errors = append(f.errors, errors.New(f.Student.DisplayName+" is not a GTF"))
+		f.errors = append(f.errors, errors.New("nobody with this duckid exists"))
+	} else if !f.Student.CanBeGE() {
+		f.errors = append(f.errors, errors.New(f.Student.DisplayName+" doesn't have the proper affiliation to be a GE"))
 	}
 
 	// Make sure the logged-in user is allowed to assign people to this crn
