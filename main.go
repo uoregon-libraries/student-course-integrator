@@ -28,7 +28,7 @@ type command struct {
 
 var cmdMap = map[string]command{
 	"server": {
-		desc: "Backoffice web server which faculty log into in order to associate GEs with courses",
+		desc: "Backoffice web server which faculty log into in order to associate GEs/GTFs with courses",
 		run:  sciserver.Run,
 	},
 	"import-csv": {
@@ -36,7 +36,7 @@ var cmdMap = map[string]command{
 		run:  importcsv.Run,
 	},
 	"export-csv": {
-		desc: "CSV exporter for sending list of GEs out to canvas",
+		desc: "CSV exporter for sending list of GEs/GTFs out to canvas",
 		run:  exportcsv.Run,
 	},
 }
