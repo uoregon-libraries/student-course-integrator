@@ -72,7 +72,7 @@ func (r *responder) processSubmission() {
 	// Require "confirm" to be exactly the string "1" so that we err on the side of not adding GEs
 	if f.Confirm == "1" {
 		msg += "; CONFIRMED"
-		err = enrollment.AddGE(f.CRN, f.Student.BannerID)
+		err = enrollment.AddGE(f.CRN, f.GE.BannerID)
 		if err != nil {
 			r.render500(fmt.Errorf("unable to write enrollment data to database: %s", err))
 			return
@@ -80,7 +80,7 @@ func (r *responder) processSubmission() {
 		audit.Log(r.vars.User, audit.ActionAssociateGE, msg)
 		var s = getSession(r.w, r.req)
 		s.SetInfoFlash(fmt.Sprintf(`%s (%s) added to %s (%s)`,
-			f.Student.DisplayName, f.Student.DuckID, f.Course.Description, f.CRN))
+			f.GE.DisplayName, f.GE.DuckID, f.Course.Description, f.CRN))
 		http.Redirect(r.w, r.req, webutil.FullPath(""), http.StatusFound)
 		return
 	}
