@@ -45,8 +45,11 @@ type lookupType string
 
 // valid lookup types - the value indicates how a person is being looked up
 const (
-	lookupByDuckID   lookupType = "duckid"
-	lookupByBannerID lookupType = "banner_id"
+	// TODO: change this if the service endpoint swap problem gets fixed
+	//lookupByDuckID   lookupType = "duckid"
+	//lookupByBannerID lookupType = "banner_id"
+	lookupByDuckID   lookupType = "banner_id"
+	lookupByBannerID lookupType = "duckid"
 )
 
 // callService is a common wrapper to call the central translation service and
