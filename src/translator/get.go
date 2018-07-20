@@ -27,9 +27,9 @@ func _getReal(url string) (content []byte, err error) {
 // trust the mock service call
 var mockResponseTemplate = `
 	{
-		"result": {
-			"banner_id": "95x00000%d",
-			"duckid": "tester%d"
+		"data": {
+			"bannerID": "95x00000%d",
+			"duckID": "tester%d"
 		},
 		"message": "%s",
 		"statusCode": %d

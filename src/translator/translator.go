@@ -30,12 +30,12 @@ func BannerIDToDuckID(uid string) (string, error) {
 }
 
 type userJSON struct {
-	BannerID string `json:"banner_id"`
-	DuckID   string `json:"duckid"`
+	BannerID string `json:"bannerID"`
+	DuckID   string `json:"duckID"`
 }
 
 type responseJSON struct {
-	User       userJSON `json:"result"`
+	User       userJSON `json:"data"`
 	Message    string   `json:"message"`
 	StatusCode int      `json:"statusCode"`
 }
