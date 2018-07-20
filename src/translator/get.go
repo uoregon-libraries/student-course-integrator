@@ -5,16 +5,40 @@ import (
 	"hash/crc32"
 	"io/ioutil"
 	"net/http"
+	"strings"
+
+	"github.com/uoregon-libraries/student-course-integrator/src/global"
 )
 
-// get aliases the getter function.  TODO: this alias should only be the real
-// getter except when testing.
-var get = _getMock
+// get aliases the getter function so we can easily run tests against the mock
+// service function
+var get = _getReal
+
+func applyHeaders(req *http.Request) error {
+	var h = global.Conf.TranslatorAPIHeaders
+	var list = strings.Split(h, "\x1e")
+	for _, fv := range list {
+		var parts = strings.SplitN(fv, ":", 2)
+		if len(parts) != 2 {
+			return fmt.Errorf("invalid header declaration %q", fv)
+		}
+		req.Header.Set(parts[0], parts[1])
+	}
+
+	return nil
+}
 
 // _getReal is a simple wrapper for REST API Get hits
 func _getReal(url string) (content []byte, err error) {
+	var req *http.Request
+	req, err = http.NewRequest("GET", url, nil)
+	if err != nil {
+		return nil, err
+	}
+	applyHeaders(req)
+
 	var resp *http.Response
-	resp, err = http.Get(url)
+	resp, err = http.DefaultClient.Do(req)
 	if err != nil {
 		return nil, err
 	}
