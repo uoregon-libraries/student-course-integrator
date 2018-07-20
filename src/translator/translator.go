@@ -53,7 +53,7 @@ const (
 // return a user response.
 func callService(lookup lookupType, val string) (user userJSON, err error) {
 	var content []byte
-	var url = global.Conf.TranslatorHost + "/" + path.Join("person", string(lookup), val)
+	var url = global.Conf.TranslatorHost + "/" + path.Join("person", "uo", string(lookup), val)
 	content, err = get(url)
 	if err != nil {
 		return user, err
