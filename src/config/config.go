@@ -20,7 +20,8 @@ type Config struct {
 	LDAPBaseDN           string `setting:"LDAP_BASE_DN"`
 	BannerCSVPath        string `setting:"BANNER_CSV_PATH" type:"path"`
 	CanvasCSVPath        string `setting:"CANVAS_CSV_PATH" type:"path"`
-	TranslatorHost       string `setting:"TRANSLATOR_HOST" type:"url"`
+	LookupByDuckIDURL    string `setting:"LOOKUP_BY_DUCKID_URL" type:"url"`
+	LookupByBannerIDURL  string `setting:"LOOKUP_BY_BANNERID_URL" type:"url"`
 	TranslatorAPIHeaders string `setting:"TRANSLATOR_API_HEADERS"`
 }
 
