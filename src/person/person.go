@@ -5,7 +5,7 @@ package person
 import (
 	"fmt"
 
-	"github.com/uoregon-libraries/student-course-integrator/src/translator"
+	"github.com/uoregon-libraries/student-course-integrator/src/service"
 )
 
 // A Person is different from a user in that this represents anybody at UO, not
@@ -35,7 +35,7 @@ func FindByDuckID(duckid string) (*Person, error) {
 	}
 
 	if p != nil {
-		p.BannerID, err = translator.DuckIDToBannerID(p.DuckID)
+		p.BannerID, err = service.DuckIDToBannerID(p.DuckID)
 		if err != nil {
 			return nil, fmt.Errorf("unable to look up Banner ID for duckid %s: %s", p.DuckID, err)
 		}

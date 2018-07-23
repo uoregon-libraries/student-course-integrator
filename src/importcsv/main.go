@@ -9,7 +9,7 @@ import (
 	"github.com/Nerdmaster/magicsql"
 	"github.com/uoregon-libraries/gopkg/logger"
 	"github.com/uoregon-libraries/student-course-integrator/src/global"
-	"github.com/uoregon-libraries/student-course-integrator/src/translator"
+	"github.com/uoregon-libraries/student-course-integrator/src/service"
 )
 
 // Run implements the CSV import for our main multi-binary
@@ -85,7 +85,7 @@ func buildData(op *magicsql.Operation, courses, enrollments [][]string) error {
 		duckid, ok = duckidMap[userID]
 		if !ok {
 			var err error
-			duckid, err = translator.BannerIDToDuckID(userID)
+			duckid, err = service.BannerIDToDuckID(userID)
 			if err != nil {
 				return fmt.Errorf("unable to look up duckid for %s: %s", userID, err)
 			}

@@ -1,4 +1,4 @@
-package translator
+package service
 
 import (
 	"encoding/json"
