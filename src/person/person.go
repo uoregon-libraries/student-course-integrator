@@ -35,10 +35,19 @@ func FindByDuckID(duckid string) (*Person, error) {
 	}
 
 	if p != nil {
-		p.BannerID, err = service.DuckIDToBannerID(p.DuckID)
+		var s = service.DuckID(p.DuckID)
+		var err = s.Call()
 		if err != nil {
 			return nil, fmt.Errorf("unable to look up Banner ID for duckid %s: %s", p.DuckID, err)
 		}
+		var r = s.Response
+		if r.StatusCode != 200 {
+			return nil, fmt.Errorf("service: status %d looking up %s: %s", r.StatusCode, p.DuckID, r.Message)
+		}
+		if r.User.BannerID == "" {
+			return nil, fmt.Errorf("lookup for duckid %s: response contains empty Banner ID", p.DuckID)
+		}
+		p.BannerID = r.User.BannerID
 	}
 	return p, nil
 }
