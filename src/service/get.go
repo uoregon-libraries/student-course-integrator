@@ -10,6 +10,8 @@ import (
 	"github.com/uoregon-libraries/student-course-integrator/src/global"
 )
 
+type getter func(url string) (content []byte, err error)
+
 // get aliases the getter function so we can easily run tests against the mock
 // service function
 var get = _getReal

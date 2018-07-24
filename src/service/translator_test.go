@@ -51,8 +51,6 @@ func TestCallServiceError(t *testing.T) {
 	assert.Equal("foo", err.Error(), "expected error text", t)
 }
 
-type getter func(url string) (content []byte, err error)
-
 func translatefn(translated *string) getter {
 	return func(url string) (content []byte, err error) {
 		*translated = url
