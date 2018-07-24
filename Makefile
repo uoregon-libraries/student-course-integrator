@@ -1,15 +1,13 @@
 .PHONY: all binaries test clean dbconf
 
-GO=vgo
+GO=go
 GOFMT=gofmt -s -l -w
-INSTALL=0
 
 all: binaries
 
 binaries:
+	$(GO) get
 	$(GO) build -o bin/sci github.com/uoregon-libraries/student-course-integrator
-	@# This is helpful to get code completion tools working while vgo is still in transition
-	@[ "$(INSTALL)" -ne "1" ] || ./scripts/install.sh
 
 format:
 	@$(GOFMT) main.go
