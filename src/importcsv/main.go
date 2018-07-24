@@ -38,7 +38,10 @@ func buildData(op *magicsql.Operation, courses, enrollments [][]string) error {
 	var courseMap = make(map[string]int64)
 
 	// Delete and repopulate courses, mapping string ids to db ids
+	logger.Debugf("Removing all existing data from 'courses' table")
 	op.Exec("DELETE FROM courses")
+	logger.Debugf("Courses removed")
+
 	var st = op.Prepare("INSERT INTO courses (canvas_id, description) VALUES (?, ?)")
 
 	var expectedLen = 6
@@ -82,10 +85,14 @@ func buildData(op *magicsql.Operation, courses, enrollments [][]string) error {
 		}
 
 		var duckid string
+		logger.Debugf("Looking up duckid for %s", userID)
 		duckid, ok = duckidMap[userID]
-		if !ok {
+		if ok {
+			logger.Debugf("Cached duckid found; skipping service request")
+		} else {
 			var s = service.BannerID(userID)
 			var err = s.Call()
+			logger.Debugf("Service request complete")
 			if err != nil {
 				return fmt.Errorf("unable to look up duckid for %s: %s", userID, err)
 			}
