@@ -9,7 +9,7 @@ import (
 )
 
 func TestMockJSON(t *testing.T) {
-	var r responseJSON
+	var r Response
 	var jstr = fmt.Sprintf(mockResponseTemplate, 1, 2, "no message", 200)
 	var err = json.Unmarshal([]byte(jstr), &r)
 	if err != nil {

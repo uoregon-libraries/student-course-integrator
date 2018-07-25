@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"os"
-	"strings"
 	"testing"
 
 	"github.com/uoregon-libraries/gopkg/assert"
@@ -21,32 +20,37 @@ func TestMain(m *testing.M) {
 }
 
 func TestCallServiceSuccess(t *testing.T) {
-	get = _getMock
-	var bannerID, err = DuckIDToBannerID("test")
+	var s = DuckID("test")
+	s.get = _getMock
+	var err = s.Call()
 	assert.NilError(err, "DuckIDToBannerID", t)
-	assert.True(bannerID != "", "bannerID isn't empty", t)
+	assert.True(s.Response.User.BannerID != "", "bannerID isn't empty", t)
 
-	var duckID string
-	duckID, err = BannerIDToDuckID("test")
+	var s2 = BannerID("test")
+	s2.get = _getMock
+	err = s2.Call()
 	assert.NilError(err, "BannerIDToDuckID", t)
-	assert.True(duckID != "", "duckID isn't empty", t)
+	assert.True(s2.Response.User.DuckID != "", "duckID isn't empty", t)
 }
 
 func TestCallServiceFailure(t *testing.T) {
-	get = func(url string) (content []byte, err error) {
+	var s = DuckID("test")
+	s.get = func(url string) (content []byte, err error) {
 		return []byte(fmt.Sprintf(mockResponseTemplate, 0, 0, "baby fall down go boom", 500)), nil
 	}
+	var err = s.Call()
 
-	var _, err = DuckIDToBannerID("test")
-	assert.True(err != nil, "500 status code from json should produce an error", t)
-	assert.True(strings.Contains(err.Error(), "baby fall down go boom"), "expected error text", t)
+	assert.NilError(err, "Service failure shouldn't be an error", t)
+	assert.Equal(500, s.Response.StatusCode, "service status", t)
+	assert.Equal("baby fall down go boom", s.Response.Message, "service message", t)
 }
 
 func TestCallServiceError(t *testing.T) {
-	get = func(url string) (content []byte, err error) {
+	var s = DuckID("test")
+	s.get = func(url string) (content []byte, err error) {
 		return nil, errors.New("foo")
 	}
-	var _, err = DuckIDToBannerID("test")
+	var err = s.Call()
 	assert.True(err != nil, "explicit error return should propagate", t)
 	assert.Equal("foo", err.Error(), "expected error text", t)
 }
@@ -60,14 +64,16 @@ func translatefn(translated *string) getter {
 
 func TestTranslatedURIDuckIDToBannerID(t *testing.T) {
 	var translated string
-	get = translatefn(&translated)
-	DuckIDToBannerID("jechols")
+	var s = DuckID("jechols")
+	s.get = translatefn(&translated)
+	s.Call()
 	assert.Equal("https://example.org/duckid=jechols", translated, "translated URI for duckid-to-bannerid", t)
 }
 
 func TestTranslatedURIBannerIDToDuckID(t *testing.T) {
 	var translated string
-	get = translatefn(&translated)
-	BannerIDToDuckID("95x000000")
+	var s = BannerID("95x000000")
+	s.get = translatefn(&translated)
+	s.Call()
 	assert.Equal("https://example.org/bannerid=95x000000", translated, "translated URI for bannerid-to-duckid", t)
 }
