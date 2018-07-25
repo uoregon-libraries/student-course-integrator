@@ -79,8 +79,8 @@ func (r *responder) processSubmission() {
 		}
 		audit.Log(r.vars.User, audit.ActionAssociateGE, msg)
 		var s = getSession(r.w, r.req)
-		s.SetInfoFlash(fmt.Sprintf(`%s (%s) added to %s (%s)`,
-			f.GE.DisplayName, f.GE.DuckID, f.Course.Description, f.CRN))
+		s.SetInfoFlash(fmt.Sprintf(`%s (%s) added to %s`,
+			f.GE.DisplayName, f.GE.DuckID, f.Course.Description))
 		http.Redirect(r.w, r.req, webutil.FullPath(""), http.StatusFound)
 		return
 	}
