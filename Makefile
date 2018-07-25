@@ -1,12 +1,14 @@
-.PHONY: all binaries test clean dbconf
+.PHONY: all deps binaries test clean dbconf
 
 GO=go
 GOFMT=gofmt -s -l -w
 
 all: binaries
 
-binaries:
+deps:
 	$(GO) get
+
+binaries:
 	$(GO) install ./src/...
 	$(GO) build -o bin/sci github.com/uoregon-libraries/student-course-integrator
 

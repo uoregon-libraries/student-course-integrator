@@ -5,7 +5,10 @@ Setup
 - Set up your GOPATH: https://golang.org/doc/code.html#GOPATH
   - Consider putting `$GOPATH/bin` into your path
 - Put this repository into `$GOPATH/src/github.com/uoregon-libraries/student-course-integrator`
+  - You can easily do this (until go 1.11) via
+    `go get github.com/uoregon-libraries/student-course-integrator`
 - Get goose for database migrations: `go get -u bitbucket.org/liamstask/goose/...`
+- `make deps` - this only needs to be run once
 - `make`
 
 Settings file
