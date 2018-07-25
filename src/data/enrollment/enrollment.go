@@ -24,7 +24,7 @@ func AddGE(courseID, userID string) error {
 // out in CSV format to w, including the CSV header (course_id, user_id, role,
 // section_id, status).  If successful, the enrollments records will be tied to
 // a new canvas_exports record.
-func ExportCSV(w io.Writer) (rows int, err error) {
+func ExportCSV(w io.WriteCloser) (rows int, err error) {
 	var buf = new(bytes.Buffer)
 	var cw = csv.NewWriter(buf)
 
@@ -64,6 +64,11 @@ func ExportCSV(w io.Writer) (rows int, err error) {
 	_, err = io.Copy(w, buf)
 	if err != nil {
 		return 0, fmt.Errorf("enrollment: error writing enrollments csv: %s", err)
+	}
+
+	err = w.Close()
+	if err != nil {
+		return 0, fmt.Errorf("enrollment: error closing enrollments csv: %s", err)
 	}
 
 	op.EndTransaction()

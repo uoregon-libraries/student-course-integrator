@@ -21,14 +21,10 @@ func Run() {
 	if !fileutil.MustNotExist(fullPath) {
 		logger.Fatalf("%q already exists!", fullPath)
 	}
-	var f, err = os.Create(fullPath)
+	var f = fileutil.NewSafeFile(fullPath)
+	var rows, err = enrollment.ExportCSV(f)
 	if err != nil {
-		logger.Fatalf("Unable to create enrollments output file %q: %s", fullPath, err)
-	}
-
-	var rows int
-	rows, err = enrollment.ExportCSV(f)
-	if err != nil {
+		f.Cancel()
 		logger.Fatalf("Unable to write enrollments CSV to file %q: %s", fullPath, err)
 	}
 
