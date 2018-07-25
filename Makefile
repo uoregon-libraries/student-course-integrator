@@ -7,6 +7,7 @@ all: binaries
 
 binaries:
 	$(GO) get
+	$(GO) install ./src/...
 	$(GO) build -o bin/sci github.com/uoregon-libraries/student-course-integrator
 
 format:
