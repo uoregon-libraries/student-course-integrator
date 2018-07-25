@@ -12,10 +12,6 @@ import (
 
 type getter func(url string) (content []byte, err error)
 
-// get aliases the getter function so we can easily run tests against the mock
-// service function
-var get = _getReal
-
 func applyHeaders(req *http.Request) error {
 	var h = global.Conf.TranslatorAPIHeaders
 	var list = strings.Split(h, "\x1e")
