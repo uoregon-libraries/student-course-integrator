@@ -22,7 +22,7 @@ func Run() {
 		logger.Fatalf("%q already exists!", fullPath)
 	}
 	var f = fileutil.NewSafeFile(fullPath)
-	var rows, err = enrollment.ExportCSV(f)
+	var rows, err = enrollment.ExportCSV(f, fullPath)
 	if err != nil {
 		f.Cancel()
 		logger.Fatalf("Unable to write enrollments CSV to file %q: %s", fullPath, err)

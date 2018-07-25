@@ -24,7 +24,7 @@ func AddGE(courseID, userID string) error {
 // out in CSV format to w, including the CSV header (course_id, user_id, role,
 // section_id, status).  If successful, the enrollments records will be tied to
 // a new canvas_exports record.
-func ExportCSV(w io.WriteCloser) (rows int, err error) {
+func ExportCSV(w io.WriteCloser, path string) (rows int, err error) {
 	var buf = new(bytes.Buffer)
 	var cw = csv.NewWriter(buf)
 
@@ -44,7 +44,8 @@ func ExportCSV(w io.WriteCloser) (rows int, err error) {
 	// Queue up a transaction rollback; this ensures we rollback on any return
 	// unless we've explicitly commited
 	defer op.Rollback()
-	var result = op.Exec("INSERT INTO canvas_exports (exported_at) VALUES (?)", time.Now())
+	var result = op.Exec("INSERT INTO canvas_exports (exported_at, path) VALUES (?, ?)",
+		time.Now(), path)
 	var exportID = result.LastInsertId()
 	op.Exec("UPDATE enrollments SET canvas_export_id = ? WHERE canvas_export_id = 0", exportID)
 	if op.Err() != nil {
