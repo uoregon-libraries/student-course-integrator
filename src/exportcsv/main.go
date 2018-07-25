@@ -28,5 +28,10 @@ func Run() {
 		logger.Fatalf("Unable to write enrollments CSV to file %q: %s", fullPath, err)
 	}
 
+	// Fry the file if no data was written to avoid empty file oddities
+	if rows == 0 {
+		os.Remove(fullPath)
+	}
+
 	logger.Infof("Done: %d row(s) written", rows)
 }

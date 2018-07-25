@@ -71,6 +71,11 @@ func ExportCSV(w io.WriteCloser) (rows int, err error) {
 		return 0, fmt.Errorf("enrollment: error closing enrollments csv: %s", err)
 	}
 
+	// Let's not waste a DB record on an empty export
+	if len(exportRows) == 0 {
+		return 0, nil
+	}
+
 	op.EndTransaction()
 
 	return len(exportRows), nil
