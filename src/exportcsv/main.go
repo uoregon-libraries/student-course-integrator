@@ -15,7 +15,7 @@ import (
 // Run implements the CSV export for our main multi-binary
 func Run() {
 	var csvPath = global.Conf.CanvasCSVPath
-	var fname = fmt.Sprintf("enrollments-%s.csv", time.Now().Format("2006-01-02"))
+	var fname = fmt.Sprintf("enrollments-%s.csv", time.Now().Format("2006-01-02-150405"))
 	var fullPath = filepath.Join(csvPath, fname)
 	logger.Infof("Writing export to %q", fullPath)
 	if !fileutil.MustNotExist(fullPath) {
