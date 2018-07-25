@@ -54,7 +54,7 @@ func (r *responder) processSubmission() {
 
 	// Explicit rejection of duckid was requested: re-render the form
 	if f.Confirm == "0" {
-		msg += "; wrong duckid, re-rendering form"
+		msg += `; rejected by user ("Go Back" clicked), re-rendering form`
 		audit.Log(r.vars.User, audit.ActionAssociateGE, msg)
 		r.render(r.hh.formTemplate)
 		return
