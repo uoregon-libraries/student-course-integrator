@@ -13,9 +13,8 @@ import (
 
 // AddGE creates a new GE record for a course, ready to be exported on the next canvas export job
 func AddGE(courseID, userID string) error {
-	// The term we use is "GE", but the actual role is "gtf"
 	var sql = "INSERT INTO enrollments (`course_id`, `user_id`, `role`, `section_id`, `status`)" +
-		"VALUES(?, ?, 'gtf', '', 'active')"
+		"VALUES(?, ?, 'GE', '', 'active')"
 	var _, err = global.DB.Exec(sql, courseID, userID)
 	return err
 }
