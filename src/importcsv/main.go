@@ -14,8 +14,8 @@ import (
 
 // Run implements the CSV import for our main multi-binary
 func Run() {
-	var courses = readCSV("courses.csv")
-	var enrollments = readCSV("enrollments.csv")
+	var courses = readCSV("courses.txt")
+	var enrollments = readCSV("enrollments.txt")
 
 	// MagicSQL wrapper lets us defer error checking
 	var db = magicsql.Wrap(global.DB)
