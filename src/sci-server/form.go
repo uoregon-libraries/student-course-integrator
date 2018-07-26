@@ -47,7 +47,7 @@ func (r *responder) getForm() (f *form, err error) {
 	if f.GE == nil {
 		f.errors = append(f.errors, errors.New("nobody with this duckid exists"))
 	} else if !f.GE.CanBeGE() {
-		f.errors = append(f.errors, errors.New(f.GE.DisplayName+" is currently not classified as a GE/GTF"))
+		f.errors = append(f.errors, errors.New(f.GE.DisplayName+" is currently not classified as a GE"))
 	}
 
 	// Make sure the logged-in user is allowed to assign people to this crn
