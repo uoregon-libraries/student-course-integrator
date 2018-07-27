@@ -9,18 +9,20 @@ import (
 
 // Config holds the configuration needed for this application to work
 type Config struct {
-	DatabaseConnect string `setting:"DB"`
-	Debug           bool   `setting:"DEBUG" type:"bool"`
-	BindAddress     string `setting:"BIND_ADDRESS"`
-	SessionSecret   string `setting:"SESSION_SECRET"`
-	AuthHeader      string `setting:"AUTH_HEADER"`
-	LDAPServer      string `setting:"LDAP_SERVER"`
-	LDAPUser        string `setting:"LDAP_BIND_USER"`
-	LDAPPass        string `setting:"LDAP_BIND_PASS"`
-	LDAPBaseDN      string `setting:"LDAP_BASE_DN"`
-	BannerCSVPath   string `setting:"BANNER_CSV_PATH" type:"path"`
-	CanvasCSVPath   string `setting:"CANVAS_CSV_PATH" type:"path"`
-	TranslatorHost  string `setting:"TRANSLATOR_HOST" type:"url"`
+	DatabaseConnect      string `setting:"DB"`
+	Debug                bool   `setting:"DEBUG" type:"bool"`
+	BindAddress          string `setting:"BIND_ADDRESS"`
+	SessionSecret        string `setting:"SESSION_SECRET"`
+	AuthHeader           string `setting:"AUTH_HEADER"`
+	LDAPServer           string `setting:"LDAP_SERVER"`
+	LDAPUser             string `setting:"LDAP_BIND_USER"`
+	LDAPPass             string `setting:"LDAP_BIND_PASS"`
+	LDAPBaseDN           string `setting:"LDAP_BASE_DN"`
+	BannerCSVPath        string `setting:"BANNER_CSV_PATH" type:"path"`
+	CanvasCSVPath        string `setting:"CANVAS_CSV_PATH" type:"path"`
+	LookupByDuckIDURL    string `setting:"LOOKUP_BY_DUCKID_URL" type:"url"`
+	LookupByBannerIDURL  string `setting:"LOOKUP_BY_BANNERID_URL" type:"url"`
+	TranslatorAPIHeaders string `setting:"TRANSLATOR_API_HEADERS"`
 }
 
 // Parse reads the given settings file and returns a parsed Config.  File paths

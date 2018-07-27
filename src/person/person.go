@@ -5,7 +5,7 @@ package person
 import (
 	"fmt"
 
-	"github.com/uoregon-libraries/student-course-integrator/src/translator"
+	"github.com/uoregon-libraries/student-course-integrator/src/service"
 )
 
 // A Person is different from a user in that this represents anybody at UO, not
@@ -35,17 +35,26 @@ func FindByDuckID(duckid string) (*Person, error) {
 	}
 
 	if p != nil {
-		p.BannerID, err = translator.DuckIDToBannerID(p.DuckID)
+		var s = service.DuckID(p.DuckID)
+		var err = s.Call()
 		if err != nil {
 			return nil, fmt.Errorf("unable to look up Banner ID for duckid %s: %s", p.DuckID, err)
 		}
+		var r = s.Response
+		if r.StatusCode != 200 {
+			return nil, fmt.Errorf("service: status %d looking up %s: %s", r.StatusCode, p.DuckID, r.Message)
+		}
+		if r.User.BannerID == "" {
+			return nil, fmt.Errorf("lookup for duckid %s: response contains empty Banner ID", p.DuckID)
+		}
+		p.BannerID = r.User.BannerID
 	}
 	return p, nil
 }
 
-// IsGTF returns true if this person's affiliations allow being assigned as
-// a GTF on a course
-func (p *Person) IsGTF() bool {
+// CanBeGE returns true if this person's affiliations allow being assigned as a
+// GE on a course
+func (p *Person) CanBeGE() bool {
 	var validAffiliations = map[string]bool{
 		"gtf": true,
 	}

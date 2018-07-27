@@ -1,20 +1,42 @@
-package translator
+package service
 
 import (
 	"fmt"
 	"hash/crc32"
 	"io/ioutil"
 	"net/http"
+	"strings"
+
+	"github.com/uoregon-libraries/student-course-integrator/src/global"
 )
 
-// get aliases the getter function.  TODO: this alias should only be the real
-// getter except when testing.
-var get = _getMock
+type getter func(url string) (content []byte, err error)
+
+func applyHeaders(req *http.Request) error {
+	var h = global.Conf.TranslatorAPIHeaders
+	var list = strings.Split(h, "\x1e")
+	for _, fv := range list {
+		var parts = strings.SplitN(fv, ":", 2)
+		if len(parts) != 2 {
+			return fmt.Errorf("invalid header declaration %q", fv)
+		}
+		req.Header.Set(parts[0], parts[1])
+	}
+
+	return nil
+}
 
 // _getReal is a simple wrapper for REST API Get hits
 func _getReal(url string) (content []byte, err error) {
+	var req *http.Request
+	req, err = http.NewRequest("GET", url, nil)
+	if err != nil {
+		return nil, err
+	}
+	applyHeaders(req)
+
 	var resp *http.Response
-	resp, err = http.Get(url)
+	resp, err = http.DefaultClient.Do(req)
 	if err != nil {
 		return nil, err
 	}
@@ -27,9 +49,9 @@ func _getReal(url string) (content []byte, err error) {
 // trust the mock service call
 var mockResponseTemplate = `
 	{
-		"result": {
-			"banner_id": "95x00000%d",
-			"duckid": "tester%d"
+		"data": {
+			"bannerID": "95x00000%d",
+			"duckID": "tester%d"
 		},
 		"message": "%s",
 		"statusCode": %d

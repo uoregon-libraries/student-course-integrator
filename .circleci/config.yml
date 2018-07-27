@@ -13,9 +13,8 @@ jobs:
       - checkout
 
       # specify any bash command here prefixed with `run: `
-      - run: go get -u golang.org/x/vgo
       - run: go get -u github.com/golang/lint/golint
-      - run: /go/src/github.com/uoregon-libraries/student-course-integrator/scripts/install.sh
+      - run: make deps
       - run: make
       - run: make validate
       - run: make test

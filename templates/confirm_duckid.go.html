@@ -1,12 +1,14 @@
-{{block "metatitle" .}}Confirmation - Canvas Student Integrator{{end}}
+{{block "metatitle" .}}Confirmation - Canvas Integrator{{end}}
 {{block "title" .}}<h1>Confirmation</h1>{{end}}
 
 {{block "content" .}}
 
 <div class="alert alert-info">
-  You're about to add {{.Form.DuckID}} ({{.Form.Student.DisplayName}}) to
-  course {{.Form.CRN}} ({{.Form.Course.Description}}).  If this is correct,
-  please choose "confirm" below.
+  You're about to add {{.Form.DuckID}} ({{.Form.GE.DisplayName}})
+  to CRN {{stripterm .Form.CRN}}, listed in Canvas as course:
+  {{.Form.Course.Description}}.
+
+  If this is correct, please choose "Confirm" below.
 </div>
 
 <form id="association-form" method="POST" action="{{FullPath ""}}">

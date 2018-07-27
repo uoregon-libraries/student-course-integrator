@@ -9,13 +9,13 @@ import (
 	"github.com/Nerdmaster/magicsql"
 	"github.com/uoregon-libraries/gopkg/logger"
 	"github.com/uoregon-libraries/student-course-integrator/src/global"
-	"github.com/uoregon-libraries/student-course-integrator/src/translator"
+	"github.com/uoregon-libraries/student-course-integrator/src/service"
 )
 
 // Run implements the CSV import for our main multi-binary
 func Run() {
-	var courses = readCSV("courses.csv")
-	var enrollments = readCSV("enrollments.csv")
+	var courses = readCSV("courses.txt")
+	var enrollments = readCSV("enrollments.txt")
 
 	// MagicSQL wrapper lets us defer error checking
 	var db = magicsql.Wrap(global.DB)
@@ -38,7 +38,10 @@ func buildData(op *magicsql.Operation, courses, enrollments [][]string) error {
 	var courseMap = make(map[string]int64)
 
 	// Delete and repopulate courses, mapping string ids to db ids
+	logger.Debugf("Removing all existing data from 'courses' table")
 	op.Exec("DELETE FROM courses")
+	logger.Debugf("Courses removed")
+
 	var st = op.Prepare("INSERT INTO courses (canvas_id, description) VALUES (?, ?)")
 
 	var expectedLen = 6
@@ -82,12 +85,26 @@ func buildData(op *magicsql.Operation, courses, enrollments [][]string) error {
 		}
 
 		var duckid string
+		logger.Debugf("Looking up duckid for %s", userID)
 		duckid, ok = duckidMap[userID]
-		if !ok {
-			var err error
-			duckid, err = translator.BannerIDToDuckID(userID)
+		if ok {
+			logger.Debugf("Cached duckid found; skipping service request")
+		} else {
+			var s = service.BannerID(userID)
+			var err = s.Call()
+			logger.Debugf("Service request complete")
 			if err != nil {
 				return fmt.Errorf("unable to look up duckid for %s: %s", userID, err)
+			}
+			var r = s.Response
+			if r.StatusCode != 200 {
+				logger.Warnf("Unable to look up duckid for %s: (code %d) %s", userID, r.StatusCode, r.Message)
+				continue
+			}
+			duckid = r.User.DuckID
+			if duckid == "" {
+				logger.Warnf("Unable to look up duckid for %s: empty duckid", userID)
+				continue
 			}
 			duckidMap[userID] = duckid
 		}

@@ -15,7 +15,7 @@ type form struct {
 	DuckID  string
 	User    *user.User
 	Course  *course.Course
-	Student *person.Person
+	GE      *person.Person
 	Confirm string
 	errors  []error
 }
@@ -39,15 +39,15 @@ func (r *responder) getForm() (f *form, err error) {
 		return f, err
 	}
 
-	// Make sure the duckid is valid and represents a GTF
-	f.Student, err = person.FindByDuckID(f.DuckID)
+	// Make sure the duckid is valid and represents somebody who can be a GE
+	f.GE, err = person.FindByDuckID(f.DuckID)
 	if err != nil {
 		return f, err
 	}
-	if f.Student == nil {
-		f.errors = append(f.errors, errors.New("duckid doesn't match a known student"))
-	} else if !f.Student.IsGTF() {
-		f.errors = append(f.errors, errors.New(f.Student.DisplayName+" is not a GTF"))
+	if f.GE == nil {
+		f.errors = append(f.errors, errors.New("nobody with this duckid exists"))
+	} else if !f.GE.CanBeGE() {
+		f.errors = append(f.errors, errors.New(f.GE.DisplayName+" is currently not classified as a GE"))
 	}
 
 	// Make sure the logged-in user is allowed to assign people to this crn

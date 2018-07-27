@@ -11,10 +11,10 @@ import (
 	"github.com/uoregon-libraries/student-course-integrator/src/global"
 )
 
-// AddGTF creates a new GTF record for a course, ready to be exported on the next canvas export job
-func AddGTF(courseID, userID string) error {
+// AddGE creates a new GE record for a course, ready to be exported on the next canvas export job
+func AddGE(courseID, userID string) error {
 	var sql = "INSERT INTO enrollments (`course_id`, `user_id`, `role`, `section_id`, `status`)" +
-		"VALUES(?, ?, 'gtf', '', 'active')"
+		"VALUES(?, ?, 'GE', '', 'active')"
 	var _, err = global.DB.Exec(sql, courseID, userID)
 	return err
 }
@@ -23,7 +23,7 @@ func AddGTF(courseID, userID string) error {
 // out in CSV format to w, including the CSV header (course_id, user_id, role,
 // section_id, status).  If successful, the enrollments records will be tied to
 // a new canvas_exports record.
-func ExportCSV(w io.Writer) (rows int, err error) {
+func ExportCSV(w io.WriteCloser, path string) (rows int, err error) {
 	var buf = new(bytes.Buffer)
 	var cw = csv.NewWriter(buf)
 
@@ -43,7 +43,8 @@ func ExportCSV(w io.Writer) (rows int, err error) {
 	// Queue up a transaction rollback; this ensures we rollback on any return
 	// unless we've explicitly commited
 	defer op.Rollback()
-	var result = op.Exec("INSERT INTO canvas_exports (exported_at) VALUES (?)", time.Now())
+	var result = op.Exec("INSERT INTO canvas_exports (exported_at, path) VALUES (?, ?)",
+		time.Now(), path)
 	var exportID = result.LastInsertId()
 	op.Exec("UPDATE enrollments SET canvas_export_id = ? WHERE canvas_export_id = 0", exportID)
 	if op.Err() != nil {
@@ -63,6 +64,16 @@ func ExportCSV(w io.Writer) (rows int, err error) {
 	_, err = io.Copy(w, buf)
 	if err != nil {
 		return 0, fmt.Errorf("enrollment: error writing enrollments csv: %s", err)
+	}
+
+	err = w.Close()
+	if err != nil {
+		return 0, fmt.Errorf("enrollment: error closing enrollments csv: %s", err)
+	}
+
+	// Let's not waste a DB record on an empty export
+	if len(exportRows) == 0 {
+		return 0, nil
 	}
 
 	op.EndTransaction()

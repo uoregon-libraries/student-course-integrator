@@ -14,7 +14,7 @@ type Action string
 
 // Our full list of valid actions
 const (
-	ActionAssociateStudent Action = "associate student to course"
+	ActionAssociateGE Action = "associate GE to course"
 )
 
 // Log writes an audit log to the database.  If the database connection fails

@@ -2,8 +2,13 @@ Setup
 --
 
 - [Install Go](https://golang.org/dl/)
-- Grab vgo: `go get -u golang.org/x/vgo`
+- Set up your GOPATH: https://golang.org/doc/code.html#GOPATH
+  - Consider putting `$GOPATH/bin` into your path
+- Put this repository into `$GOPATH/src/github.com/uoregon-libraries/student-course-integrator`
+  - You can easily do this (until go 1.11) via
+    `go get github.com/uoregon-libraries/student-course-integrator`
 - Get goose for database migrations: `go get -u bitbucket.org/liamstask/goose/...`
+- `make deps` - this only needs to be run once
 - `make`
 
 Settings file
@@ -75,15 +80,3 @@ If you install [entr](http://www.entrproject.org/), you can speed up your
 development loop by running [`./scripts/devloop.sh`](./scripts/devloop.sh),
 which runs [`makerun.sh`](./scripts/makerun.sh) whenever `entr` detects a
 change to any file or directory under `src/`.
-
-**Note**: The make recipe uses vgo, which doesn't install compiled packages in
-a location that's friendly for things like `gocode` to give you auto-completion
-features.  If you want compiled package files generated, you'll have to
-override the `INSTALL` variable when you run `make`:
-
-```bash
-export INSTALL=1
-make -e
-```
-
-`./scripts/devloop.sh` runs this way in order to ease development as much as it can.
