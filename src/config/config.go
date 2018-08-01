@@ -23,6 +23,8 @@ type Config struct {
 	LookupByDuckIDURL    string `setting:"LOOKUP_BY_DUCKID_URL" type:"url"`
 	LookupByBannerIDURL  string `setting:"LOOKUP_BY_BANNERID_URL" type:"url"`
 	TranslatorAPIHeaders string `setting:"TRANSLATOR_API_HEADERS"`
+	CanvasAPIURL         string `setting:"CANVAS_API_URL"`
+	CanvasAPIHeaders     string `setting:"CANVAS_API_HEADERS"`
 }
 
 // Parse reads the given settings file and returns a parsed Config.  File paths
