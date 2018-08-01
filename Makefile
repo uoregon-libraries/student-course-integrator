@@ -9,6 +9,7 @@ deps:
 	$(GO) get
 
 binaries:
+	@./scripts/hackversion.sh
 	$(GO) install ./src/...
 	$(GO) build -o bin/sci github.com/uoregon-libraries/student-course-integrator
 
