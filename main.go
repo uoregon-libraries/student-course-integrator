@@ -19,6 +19,7 @@ import (
 	"github.com/uoregon-libraries/student-course-integrator/src/global"
 	"github.com/uoregon-libraries/student-course-integrator/src/importcsv"
 	"github.com/uoregon-libraries/student-course-integrator/src/sci-server"
+	"github.com/uoregon-libraries/student-course-integrator/src/version"
 )
 
 type command struct {
@@ -42,7 +43,7 @@ var cmdMap = map[string]command{
 }
 
 func usageErr(e string) {
-	fmt.Fprintf(os.Stderr, "\x1b[31;1m%s\x1b[0m\n\nUsage: sci <subcommand>\n\n", e)
+	fmt.Fprintf(os.Stderr, "\x1b[31;1m%s\x1b[0m\n\n(version %s)\nUsage: sci <subcommand>\n\n", e, version.Version())
 	var keys []string
 	var maxlen int
 	for key := range cmdMap {
