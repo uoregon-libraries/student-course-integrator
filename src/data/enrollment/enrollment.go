@@ -1,13 +1,12 @@
 package enrollment
 
 import (
-	"bytes"
 	"encoding/csv"
 	"fmt"
-	"io"
 	"time"
 
 	"github.com/Nerdmaster/magicsql"
+	"github.com/uoregon-libraries/gopkg/fileutil"
 	"github.com/uoregon-libraries/student-course-integrator/src/global"
 )
 
@@ -19,74 +18,101 @@ func AddGE(courseID, userID string) error {
 	return err
 }
 
+// Export wraps the database and filesystem information surrounding a CSV
+// export of enrollments
+type Export struct {
+	op   *magicsql.Operation
+	w    fileutil.WriteCancelCloser
+	ID   int64
+	Rows int
+}
+
+// Close ends the database transaction and finalizes the export's file if there
+// were no database errors.  As a special case, if no data was available to
+// export, no file is writen and the database changers are reverted to avoid
+// empty files and db export records.
+func (e *Export) Close() error {
+	if e.Rows == 0 {
+		e.Cancel()
+		return nil
+	}
+
+	e.op.EndTransaction()
+	if e.op.Err() != nil {
+		e.w.Cancel()
+		return e.op.Err()
+	}
+
+	return e.w.Close()
+}
+
+// Cancel cancels the export file's write and rolls back the database changes
+func (e *Export) Cancel() {
+	e.op.Rollback()
+	e.w.Cancel()
+}
+
 // ExportCSV finds all unexported enrollments in the database and writes them
 // out in CSV format to w, including the CSV header (course_id, user_id, role,
-// section_id, status).  If successful, the enrollments records will be tied to
-// a new canvas_exports record.
-func ExportCSV(w io.WriteCloser, path string) (rows int, err error) {
-	var buf = new(bytes.Buffer)
-	var cw = csv.NewWriter(buf)
+// section_id, status).
+//
+// The path is only necessary to associate the filename with the export in the
+// database.  the file is not accessed or manipulated except through the
+// WriteCancelCloser.
+//
+// On succes, the enrollments records will be tied to a new canvas_exports
+// record and the returned Export will be ready for finalizing.  The caller
+// must either commit or roll back the database transaction, as makes sense for
+// whatever other operations are happening (e.g., the Canvas API call).
+func ExportCSV(w fileutil.WriteCancelCloser, path string) (*Export, error) {
+	var export = &Export{w: w}
+	var cw = csv.NewWriter(w)
 
-	err = cw.Write([]string{"course_id", "user_id", "role", "section_id", "status"})
+	var err = cw.Write([]string{"course_id", "user_id", "role", "section_id", "status"})
 	if err != nil {
-		return 0, fmt.Errorf("enrollment: cannot write CSV header: %s", err)
+		return nil, fmt.Errorf("enrollment: cannot write CSV header: %s", err)
 	}
 
 	// MagicSQL wrapper lets us handle error checking in "clumps"
 	var db = magicsql.Wrap(global.DB)
 
-	// Create an export record and tie all unexported enrollments to it.
-	// Assuming the CSV writer doesn't fail, the database manipulation is done.
-	var op = db.Operation()
-	op.BeginTransaction()
+	// Create an export record and tie all unexported enrollments to it
+	export.op = db.Operation()
+	export.op.BeginTransaction()
 
-	// Queue up a transaction rollback; this ensures we rollback on any return
-	// unless we've explicitly commited
-	defer op.Rollback()
-	var result = op.Exec("INSERT INTO canvas_exports (exported_at, path) VALUES (?, ?)",
+	var fail = func(err error) (*Export, error) {
+		export.Cancel()
+		return nil, err
+	}
+
+	var result = export.op.Exec("INSERT INTO canvas_exports (exported_at, path) VALUES (?, ?)",
 		time.Now(), path)
-	var exportID = result.LastInsertId()
-	op.Exec("UPDATE enrollments SET canvas_export_id = ? WHERE canvas_export_id = 0", exportID)
-	if op.Err() != nil {
-		return 0, fmt.Errorf("enrollment: database prep error: %s", op.Err())
+	export.ID = result.LastInsertId()
+	export.op.Exec("UPDATE enrollments SET canvas_export_id = ? WHERE canvas_export_id = 0", export.ID)
+	if export.op.Err() != nil {
+		return fail(fmt.Errorf("enrollment: database prep error: %s", export.op.Err()))
 	}
 
-	var exportRows = getStringRowsForID(op, exportID)
-	if op.Err() != nil {
-		return 0, fmt.Errorf("enrollment: error reading enrollments table: %s", op.Err())
+	var rows = export.rowsStrings()
+	if export.op.Err() != nil {
+		return fail(fmt.Errorf("enrollment: error reading enrollments table: %s", export.op.Err()))
 	}
 
-	err = cw.WriteAll(exportRows)
+	err = cw.WriteAll(rows)
 	if err != nil {
-		return 0, fmt.Errorf("enrollment: error writing enrollments csv: %s", err)
+		return fail(fmt.Errorf("enrollment: error writing enrollments csv: %s", err))
 	}
 
-	_, err = io.Copy(w, buf)
-	if err != nil {
-		return 0, fmt.Errorf("enrollment: error writing enrollments csv: %s", err)
-	}
-
-	err = w.Close()
-	if err != nil {
-		return 0, fmt.Errorf("enrollment: error closing enrollments csv: %s", err)
-	}
-
-	// Let's not waste a DB record on an empty export
-	if len(exportRows) == 0 {
-		return 0, nil
-	}
-
-	op.EndTransaction()
-
-	return len(exportRows), nil
+	export.Rows = len(rows)
+	return export, nil
 }
 
-func getStringRowsForID(op *magicsql.Operation, id int64) [][]string {
-	var rows = op.Query(`
+func (e *Export) rowsStrings() [][]string {
+	var rows = e.op.Query(`
 		SELECT course_id, user_id, role, section_id, status
 		FROM enrollments
 		WHERE canvas_export_id = ?
-	`, id)
+	`, e.ID)
 
 	var csvRows [][]string
 	var courseID, userID, role, sectionID, status string
