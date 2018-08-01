@@ -26,7 +26,7 @@ var (
 // initRootTemplates sets up pre-parsed templates
 func initRootTemplates(templatePath string, debug bool) {
 	var templateFunctions = tmpl.FuncMap{
-		"Version":   func() string { return version.Version },
+		"Version":   version.Version,
 		"Debug":     func() bool { return debug },
 		"stripterm": stripterm,
 	}

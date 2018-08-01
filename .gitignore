@@ -1,3 +1,4 @@
 /bin
 /db/dbconf.yml
 /sci.conf
+/src/version/commit.go
