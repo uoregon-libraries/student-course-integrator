@@ -40,6 +40,10 @@ var cmdMap = map[string]command{
 		desc: "Exporter for generating the list of GEs to the configured CSV location",
 		run:  exportcsv.RunFileExport,
 	},
+	"export-canvas": {
+		desc: "Exporter for generating the GE CSV and then sending it to canvas",
+		run:  exportcsv.RunAPIExport,
+	},
 }
 
 func usageErr(e string) {
