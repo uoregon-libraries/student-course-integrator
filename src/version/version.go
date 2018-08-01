@@ -4,6 +4,7 @@ package version
 // version we expect them to be
 const version = "1.0.0"
 
+// Version returns a combination of main version string and commit
 func Version() string {
 	return version + "-" + commit
 }
