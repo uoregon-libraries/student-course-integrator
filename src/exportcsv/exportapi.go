@@ -2,7 +2,9 @@ package exportcsv
 
 import (
 	"bytes"
+	"io"
 	"io/ioutil"
+	"mime/multipart"
 	"net/http"
 
 	"github.com/uoregon-libraries/gopkg/fileutil"
@@ -44,23 +46,44 @@ func RunAPIExport() {
 	}
 
 	logger.Infof("CSV file done: %d rows written", export.Rows)
-	logger.Infof("Sending CSV to Canvas")
+	logger.Infof("Preparing to connect to Canvas endpoint")
 
 	var fatalf = func(format string, args ...interface{}) {
 		export.Cancel()
 		logger.Fatalf(format, args...)
 	}
 
+	logger.Infof("Building multipart form")
+	var formbuf bytes.Buffer
+	var form = multipart.NewWriter(&formbuf)
+	var fwriter io.Writer
+	fwriter, err = form.CreateFormFile("attachment", "enrollments.csv")
+	if err != nil {
+		fatalf("Unable to build form for Canvas API request: %s", err)
+	}
+	_, err = io.Copy(fwriter, bytes.NewReader(w.buf))
+	if err != nil {
+		fatalf("Unable to build form for Canvas API request: %s", err)
+	}
+	err = form.Close()
+	if err != nil {
+		fatalf("Unable to build form for Canvas API request: %s", err)
+	}
+
+	logger.Infof("Building HTTP request")
 	var c = new(http.Client)
 	var r *http.Request
-	r, err = http.NewRequest("POST", global.Conf.CanvasAPIURL, bytes.NewReader(w.buf))
+	r, err = http.NewRequest("POST", global.Conf.CanvasAPIURL, &formbuf)
 	if err != nil {
 		fatalf("Unable to set up Canvas export http request: %s", err)
 	}
+	r.Header.Set("Content-Type", form.FormDataContentType())
 	err = service.ApplyHeaders(r, global.Conf.CanvasAPIHeaders)
 	if err != nil {
 		fatalf("Unable to parse Canvas API call headers: %s", err)
 	}
+
+	logger.Infof("Sending CSV to Canvas")
 	var resp *http.Response
 	resp, err = c.Do(r)
 	if err != nil {
