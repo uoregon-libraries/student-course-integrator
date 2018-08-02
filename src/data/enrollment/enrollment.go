@@ -29,7 +29,7 @@ type Export struct {
 
 // Close ends the database transaction and finalizes the export's file if there
 // were no database errors.  As a special case, if no data was available to
-// export, no file is writen and the database changers are reverted to avoid
+// export, no file is writen and the database changes are reverted to avoid
 // empty files and db export records.
 func (e *Export) Close() error {
 	if e.Rows == 0 {

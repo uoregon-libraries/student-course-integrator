@@ -9,7 +9,7 @@ import (
 	"github.com/uoregon-libraries/student-course-integrator/src/global"
 )
 
-// csvSafeFile returns a filename for use in the CSV export using the
+// csvFilename returns a filename for use in the CSV export using the
 // configured Canvas CSV output path, the current date and time, and a sequence
 // number.  If after multiple sequenced version of the file, all tested
 // filenames exist, this function will panic.
