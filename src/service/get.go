@@ -12,8 +12,10 @@ import (
 
 type getter func(url string) (content []byte, err error)
 
-func applyHeaders(req *http.Request) error {
-	var h = global.Conf.TranslatorAPIHeaders
+// ApplyHeaders takes a string of header data joined by \x1e in the way our
+// configuration headers are stored, and applies the headers to the given
+// request.  If the header string is invalid in any way, an error is returned.
+func ApplyHeaders(req *http.Request, h string) error {
 	var list = strings.Split(h, "\x1e")
 	for _, fv := range list {
 		var parts = strings.SplitN(fv, ":", 2)
@@ -33,7 +35,7 @@ func _getReal(url string) (content []byte, err error) {
 	if err != nil {
 		return nil, err
 	}
-	applyHeaders(req)
+	ApplyHeaders(req, global.Conf.TranslatorAPIHeaders)
 
 	var resp *http.Response
 	resp, err = http.DefaultClient.Do(req)
