@@ -14,8 +14,8 @@ if [[ $dest == "" ]]; then
   exit 1
 fi
 
-rsync -av --delete $src/bin/ $dest/bin/
-rsync -av --delete $src/db/migrations $dest/db/
-rsync -av --delete $src/scripts/ $dest/scripts/
-rsync -av --delete $src/static/ $dest/static/
-rsync -av --delete $src/templates/ $dest/templates/
+rsync -a --delete $src/bin/ $dest/bin/
+rsync -a --delete $src/db/migrations $dest/db/
+rsync -a --delete $src/scripts/ $dest/scripts/
+rsync -a --delete $src/static/ $dest/static/
+rsync -a --delete $src/templates/ $dest/templates/
