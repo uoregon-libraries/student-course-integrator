@@ -1,0 +1,12 @@
+[Unit]
+	Description=Student Course Integrator
+	After=network.target
+
+[Service]
+	Type=simple
+	WorkingDirectory=/usr/local/sci
+	ExecStart=/usr/local/sci/bin/sci server
+	SyslogIdentifier=sci-httpd
+
+[Install]
+	WantedBy=multi-user.target
