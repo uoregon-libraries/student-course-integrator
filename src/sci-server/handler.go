@@ -35,6 +35,7 @@ func hHome() *homeHandler {
 
 // ServeHTTP implements http.Handler for homeHandler
 func (h *homeHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
+	warmCache()
 	var r = respond(w, req, h)
 	if req.Method == "POST" {
 		r.processSubmission()
