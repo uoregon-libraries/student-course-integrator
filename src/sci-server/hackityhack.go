@@ -5,6 +5,7 @@
 package sciserver
 
 import (
+	"sync"
 	"time"
 
 	"github.com/uoregon-libraries/gopkg/logger"
@@ -12,17 +13,21 @@ import (
 )
 
 var lastWarmed time.Time
+var m sync.Mutex
 
 func warmCache() {
+	m.Lock()
+	defer m.Unlock()
+
 	if time.Since(lastWarmed) < time.Hour {
 		return
 	}
+	lastWarmed = time.Now()
 	go hackityhackWarmIt()
 }
 
 func hackityhackWarmIt() {
 	logger.Debugf("Warming the person lookup cache")
-	lastWarmed = time.Now()
 	service.DuckID("nobody").Call()
 	logger.Debugf("Warmed")
 }
