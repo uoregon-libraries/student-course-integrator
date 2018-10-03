@@ -41,6 +41,9 @@ func FindByDuckID(duckid string) (*Person, error) {
 			return nil, fmt.Errorf("unable to look up Banner ID for duckid %s: %s", p.DuckID, err)
 		}
 		var r = s.Response
+		if r.StatusCode == 404 {
+			return nil, nil
+		}
 		if r.StatusCode != 200 {
 			return nil, fmt.Errorf("service: status %d looking up %s: %s", r.StatusCode, p.DuckID, r.Message)
 		}
