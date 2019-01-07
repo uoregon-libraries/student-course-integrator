@@ -38,7 +38,7 @@ func connect() (*connection, error) {
 	return &connection{lc: l, open: true}, nil
 }
 
-// find pulls user data for the given duckid
+// find creates a partially-populated Person record for the given duckid
 func (c *connection) find(duckid string) (*Person, error) {
 	var entry, err = c.search(duckid)
 
@@ -57,6 +57,11 @@ func (c *connection) find(duckid string) (*Person, error) {
 	}, nil
 }
 
+// search runs a search against LDAP for the given duckid, returning the raw
+// LDAP record on success.  If LDAP fails, or the search finds more than one
+// person, it is considered unsuccessful and an error is returned.  If nobody
+// is found, a nil record is returned, but this is not considered an error,
+// just a nonexistent duckid.
 func (c *connection) search(duckid string) (*ldap.Entry, error) {
 	// NewSearchRequest is way more painful to read than just instantiating the
 	// thing with named values
