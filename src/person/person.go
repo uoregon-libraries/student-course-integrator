@@ -55,14 +55,17 @@ func FindByDuckID(duckid string) (*Person, error) {
 	return p, nil
 }
 
+// validGEAffiliations stores our list of which UO LDAP affiliations are valid
+// for determining if somebody is allowed to be assigned as a GE
+var validGEAffiliations = map[string]bool{
+	"gtf": true,
+}
+
 // CanBeGE returns true if this person's affiliations allow being assigned as a
 // GE on a course
 func (p *Person) CanBeGE() bool {
-	var validAffiliations = map[string]bool{
-		"gtf": true,
-	}
 	for _, aff := range p.Affiliations {
-		if validAffiliations[aff] {
+		if validGEAffiliations[aff] {
 			return true
 		}
 	}
