@@ -15,8 +15,8 @@ import (
 type Person struct {
 	BannerID     string // "95 number"
 	DuckID       string
-	Affiliations []string
-	DisplayName  string
+	Affiliations []string // Affiliations: things like faculty, staff, GTF, etc
+	DisplayName  string   // Banner's display name for the individual
 }
 
 // FindByDuckID searches LDAP for the given duckid and returns a Person record

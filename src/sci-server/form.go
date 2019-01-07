@@ -9,15 +9,21 @@ import (
 	"github.com/uoregon-libraries/student-course-integrator/src/person"
 )
 
-// form holds the submission data: crn and duckid
+// form holds the submission data as well as derived fields which are loaded
+// based on the user filling out the form and the form fields themselves
 type form struct {
-	CRN     string
-	DuckID  string
-	User    *user.User
-	Course  *course.Course
-	GE      *person.Person
-	Confirm string
-	errors  []error
+	// Actual form fields: CRN and DuckID
+	CRN     string // CRN holds the submitted dropdown value for the selected course, e.g., "201704.X3159"
+	DuckID  string // DuckID holds the submitted duckid of the user being added, e.g., "echjeremy"
+	Confirm string // Confirm is "1" when the form is re-submitted after confirmation of the GE by name
+
+	// Derived fields
+	User   *user.User     // User gets populated with the faculty member who is logged in
+	Course *course.Course // Course gets the course by looking up the faculty member + CRN
+	GE     *person.Person // GE is the person being set up as a GE, after looking up the DuckID
+
+	// Internal data
+	errors []error // errors will be populated with anything preventing the form submission, e.g., a bad duckid
 }
 
 func (r *responder) getForm() (f *form, err error) {
