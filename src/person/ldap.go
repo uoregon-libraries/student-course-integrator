@@ -3,14 +3,11 @@ package person
 import (
 	"crypto/tls"
 	"fmt"
-	"regexp"
 	"strings"
 
 	"github.com/uoregon-libraries/student-course-integrator/src/global"
 	ldap "gopkg.in/ldap.v2"
 )
-
-var scrubLDAP = regexp.MustCompile(``)
 
 // connection wraps ldap.Conn to provide search functionality
 type connection struct {
