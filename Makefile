@@ -28,5 +28,5 @@ version:
 clean:
 	rm bin/* -f
 
-dbconf:
-	./scripts/makedbconf.sh
+dbmigrate:
+	./scripts/dbmigrate.sh

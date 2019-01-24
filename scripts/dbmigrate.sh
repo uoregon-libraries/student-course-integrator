@@ -24,5 +24,5 @@ echo "development:" >db/dbconf.yml
 echo "  driver: mysql" >>db/dbconf.yml
 echo "  open: $DB" >>db/dbconf.yml
 
-echo "Database configuration has been created, and goose installation was "
-echo "confirmed.  You may now run 'goose up' to migrate."
+goose up
+rm db/dbconf.yml

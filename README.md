@@ -125,7 +125,6 @@ export SCI_LDAP_BASE_DN="dc=ad,dc=mysite,dc=org"
 TODO:
 ---
 
-- Implement `make dbmigrate`!!
 - Continue fixing this document - still need to reintegrate the bits below
   about debug URLs, running the server, using entr and the devloop script, ...
 - Maybe it's time to get docker-compose wrapping this project, too - could ease
