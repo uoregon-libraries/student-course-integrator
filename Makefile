@@ -23,10 +23,12 @@ test: version
 	@$(GO) test ./... | grep -v "^?.*no test files"
 
 version:
-	@./scripts/hackversion.sh
+	@go generate github.com/uoregon-libraries/student-course-integrator/src/version
+	@chmod a+w src/version/build.go 2>/dev/null || true
 
 clean:
 	rm bin/* -f
+	rm src/version/commit.go -f
 
 dbmigrate:
 	./scripts/dbmigrate.sh
