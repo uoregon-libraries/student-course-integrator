@@ -10,7 +10,7 @@ deps: version
 
 binaries: version
 	$(GO) install ./src/...
-	$(GO) build -o bin/sci github.com/uoregon-libraries/student-course-integrator
+	$(GO) build -o bin/sci
 
 format: version
 	@$(GOFMT) main.go
@@ -23,7 +23,7 @@ test: version
 	@$(GO) test ./... | grep -v "^?.*no test files"
 
 version:
-	@go generate github.com/uoregon-libraries/student-course-integrator/src/version
+	@go generate ./src/version
 	@chmod a+w src/version/build.go 2>/dev/null || true
 
 clean:
