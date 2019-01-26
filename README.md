@@ -122,31 +122,56 @@ export SCI_LDAP_BIND_PASS="s3cur3!"
 export SCI_LDAP_BASE_DN="dc=ad,dc=mysite,dc=org"
 ```
 
-TODO:
----
-
-- Continue fixing this document - still need to reintegrate the bits below
-  about debug URLs, running the server, using entr and the devloop script, ...
-- Maybe it's time to get docker-compose wrapping this project, too - could ease
-  configuration as well as the dev loop script.
-- Build some dummy seed data!
-
 Run the server
 ---
+
+Assuming sci.conf is setup the way you want, simply type:
 
 ```bash
 ./bin/sci server
 ```
 
-Development
+Visit `http://localhost:8080` (if your sci.conf kept the default port) and you
+should see the app's "not authorized" page, and you'll be logged in as
+"dummyuser" in place of a real authorization.
+
+In debug mode, you can fake a login as any other user by visiting the page with
+a "debuguser" query argument.  For example, `http://localhost:8080/?debuguser=jechols`.
+The page will have a large, visible warning if it is in debug mode to avoid
+accidentally pushing debug to production.
+
+Populate the database
 ---
 
-As mentioned above, consider using docker to ease development by giving you a
-preconfigured database.  You can then populate the "sci" database tables with
-any fake (or real) courses and user ids.  To log in as any given user, make
-sure you have DEBUG set to true in your configuration (or `export SCI_DEBUG =
-1` to temporarily set this up), then visit the app with a "debuguser" query
-argument.  For example, `http://localhost:8080/?debuguser=jechols`.
+You will need to populate the "sci" database tables with any fake (or real)
+courses and user ids.
+
+You can load a small sample of test data by importing all the SQL in `db/seed`
+into your mariadb instance:
+
+```bash
+docker-compose exec db mysql -usci -psci -Dsci -e "source /tmp/seed.sql"
+```
+
+Once you've done this, use the "debuguser" argument mentioned previously to
+sign in as "dsgnprof", "aaapprof", or "noidear" and you'll see different lists
+of courses you can fake-add students to.
+
+---
+
+
+You can also import actual Banner export files with the CSV importer.  You'll
+need to change your `BANNER_CSV_PATH` variable and then run the importer:
+
+```bash
+SCI_BANNER_CSV_PATH="/path/to/dev/seed/data" ./bin/sci import-csv
+```
+
+Once you have populated the database, you can fake a login as any real users to
+see what courses are available for attaching students.
+
+Development loop
+---
 
 If you install [entr](http://www.entrproject.org/), you can speed up your
 development loop by running [`./scripts/devloop.sh`](./scripts/devloop.sh),
