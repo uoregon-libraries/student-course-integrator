@@ -25,4 +25,3 @@ echo "  driver: mysql" >>db/dbconf.yml
 echo "  open: $DB" >>db/dbconf.yml
 
 goose up
-rm db/dbconf.yml
