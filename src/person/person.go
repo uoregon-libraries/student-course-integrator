@@ -4,6 +4,8 @@ package person
 
 import (
 	"fmt"
+    "strings"
+    "regexp"
 
 	"github.com/uoregon-libraries/student-course-integrator/src/service"
 )
@@ -28,31 +30,32 @@ func FindByDuckID(duckid string) (*Person, error) {
 	}
 	defer c.lc.Close()
 
+    var s = service.DuckID(duckid)
+    if IsBannerID(duckid) {
+        s = service.BannerID(duckid)
+    }
+	var service_err = s.Call()
+	if service_err != nil {
+		return nil, fmt.Errorf("unable to look up Banner ID for %s: %s", duckid, service_err)
+	}
+	var r = s.Response
+	if r.StatusCode == 404 {
+		return nil, nil
+	}
+	if r.StatusCode != 200 {
+		return nil, fmt.Errorf("service: status %d looking up %s: %s", r.StatusCode, duckid, r.Message)
+	}
+	if r.User.BannerID == "" {
+		return nil, fmt.Errorf("lookup for duckid %s: response contains empty Banner ID", duckid)
+	}
 	var p *Person
-	p, err = c.find(duckid)
+	p, err = c.find(r.User.DuckID)
 	if err != nil {
 		return nil, err
 	}
-
-	if p != nil {
-		var s = service.DuckID(p.DuckID)
-		var err = s.Call()
-		if err != nil {
-			return nil, fmt.Errorf("unable to look up Banner ID for duckid %s: %s", p.DuckID, err)
-		}
-		var r = s.Response
-		if r.StatusCode == 404 {
-			return nil, nil
-		}
-		if r.StatusCode != 200 {
-			return nil, fmt.Errorf("service: status %d looking up %s: %s", r.StatusCode, p.DuckID, r.Message)
-		}
-		if r.User.BannerID == "" {
-			return nil, fmt.Errorf("lookup for duckid %s: response contains empty Banner ID", p.DuckID)
-		}
-		p.BannerID = r.User.BannerID
-	}
+	p.BannerID = r.User.BannerID
 	return p, nil
+
 }
 
 // validGEAffiliations stores our list of which UO LDAP affiliations are valid
@@ -70,4 +73,11 @@ func (p *Person) CanBeGE() bool {
 		}
 	}
 	return false
+}
+
+// Check to see if id is a 9 digit number
+func IsBannerID(str_id string) bool {
+    clean := strings.Replace(str_id, "-", "", -1)
+    re := regexp.MustCompile("[0-9]{9}")
+    return re.MatchString(clean)
 }
