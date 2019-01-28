@@ -115,10 +115,12 @@ Read below for details, but this is the quick setup info:
 # Start up the database server if you haven't already done so
 docker-compose up -d
 
-# Migrate the database
+# Migrate the database - this must happen at least once when you first start
+# the project, then again anytime a migration is added
 make dbmigrate
 
-# Populate the database
+# Populate the database - this must happen **only once**, otherwise any local
+# changes to courses or faculty will be destroyed.
 docker-compose exec db mysql -usci -psci -Dsci -e "source /tmp/seed.sql"
 
 # Run the SCI http listener
@@ -151,6 +153,9 @@ into your dockerized database container:
 docker-compose exec db mysql -usci -psci -Dsci -e "source /tmp/seed.sql"
 ```
 
+**Note**: on your first use, or after docker volumes have been destroyed, you'll want to
+seed data.  But you don't re-run seeds every time you start up the server.
+
 ### Run SCI
 
 Simply type `./bin/sci server`.  The command reads your local `sci.conf`, so it
@@ -170,7 +175,6 @@ accidentally pushing debug to production.
 If you used the seed data, use the "debuguser" argument to sign in as
 "dsgnprof", "aaapprof", or "noidear" and you'll see different lists of courses
 you can fake-add students to.
-
 
 Development loop
 ---
