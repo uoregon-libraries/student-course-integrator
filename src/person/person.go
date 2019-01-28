@@ -4,8 +4,8 @@ package person
 
 import (
 	"fmt"
-    "strings"
-    "regexp"
+	"regexp"
+	"strings"
 
 	"github.com/uoregon-libraries/student-course-integrator/src/service"
 )
@@ -30,10 +30,10 @@ func FindByDuckID(duckid string) (*Person, error) {
 	}
 	defer c.lc.Close()
 
-    var s = service.DuckID(duckid)
-    if IsBannerID(duckid) {
-        s = service.BannerID(duckid)
-    }
+	var s = service.DuckID(duckid)
+	if IsBannerID(duckid) {
+		s = service.BannerID(duckid)
+	}
 	var serviceErr = s.Call()
 	if serviceErr != nil {
 		return nil, fmt.Errorf("unable to look up Banner ID for %s: %s", duckid, serviceErr)
@@ -53,7 +53,9 @@ func FindByDuckID(duckid string) (*Person, error) {
 	if err != nil {
 		return nil, err
 	}
-	p.BannerID = r.User.BannerID
+	if p != nil {
+		p.BannerID = r.User.BannerID
+	}
 	return p, nil
 
 }
@@ -76,8 +78,8 @@ func (p *Person) CanBeGE() bool {
 }
 
 // IsBannerID returns true if id is a 9 digit number
-func IsBannerID(stringId string) bool {
-    clean := strings.Replace(stringId, "-", "", -1)
-    re := regexp.MustCompile("[0-9]{9}")
-    return re.MatchString(clean)
+func IsBannerID(stringID string) bool {
+	clean := strings.Replace(stringID, "-", "", -1)
+	re := regexp.MustCompile("[0-9]{9}")
+	return re.MatchString(clean)
 }
