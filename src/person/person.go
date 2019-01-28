@@ -34,9 +34,9 @@ func FindByDuckID(duckid string) (*Person, error) {
     if IsBannerID(duckid) {
         s = service.BannerID(duckid)
     }
-	var service_err = s.Call()
-	if service_err != nil {
-		return nil, fmt.Errorf("unable to look up Banner ID for %s: %s", duckid, service_err)
+	var serviceErr = s.Call()
+	if serviceErr != nil {
+		return nil, fmt.Errorf("unable to look up Banner ID for %s: %s", duckid, serviceErr)
 	}
 	var r = s.Response
 	if r.StatusCode == 404 {
@@ -75,9 +75,9 @@ func (p *Person) CanBeGE() bool {
 	return false
 }
 
-// Check to see if id is a 9 digit number
-func IsBannerID(str_id string) bool {
-    clean := strings.Replace(str_id, "-", "", -1)
+// IsBannerID returns true if id is a 9 digit number
+func IsBannerID(stringId string) bool {
+    clean := strings.Replace(stringId, "-", "", -1)
     re := regexp.MustCompile("[0-9]{9}")
     return re.MatchString(clean)
 }
