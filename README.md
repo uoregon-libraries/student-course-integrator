@@ -81,24 +81,6 @@ SCI run locally.  The example configuration is set up to make development
 easier, but there are still details not filled in.  The file is well-commented
 to ensure easier understanding of the configuration needs.
 
-- Point out places in sci.conf that *must* be overridden
-- Seed data for dev so users can test out functionality
-
-### Set up the database
-
-You'll need to set up a database and user for SCI to store its faculty/course
-association.  For development, this is trivial by using the supplied
-docker-compose configuration:
-
-```bash
-docker-compose up -d
-```
-
-That would generate a database with username, password, and database name of
-"sci" (which match the defaults in the example configuration).
-
-Use `make dbmigrate` to run the goose migrations.
-
 SCI's Settings
 ---
 
@@ -122,34 +104,107 @@ export SCI_LDAP_BIND_PASS="s3cur3!"
 export SCI_LDAP_BASE_DN="dc=ad,dc=mysite,dc=org"
 ```
 
-TODO:
----
-
-- Implement `make dbmigrate`!!
-- Continue fixing this document - still need to reintegrate the bits below
-  about debug URLs, running the server, using entr and the devloop script, ...
-- Maybe it's time to get docker-compose wrapping this project, too - could ease
-  configuration as well as the dev loop script.
-- Build some dummy seed data!
-
 Run the server
 ---
 
+### Summary
+
+Read below for details, but this is the quick setup info:
+
 ```bash
+# Start up the database server if you haven't already done so
+docker-compose up -d
+
+# Migrate the database - this must happen at least once when you first start
+# the project, then again anytime a migration is added
+make dbmigrate
+
+# Populate the database - this must happen **only once**, otherwise any local
+# changes to courses or faculty will be destroyed.
+docker-compose exec db mysql -usci -psci -Dsci -e "source /tmp/seed.sql"
+
+# Run the SCI http listener
 ./bin/sci server
 ```
 
-Development
----
+### Prepare the database
 
-As mentioned above, consider using docker to ease development by giving you a
-preconfigured database.  You can then populate the "sci" database tables with
-any fake (or real) courses and user ids.  To log in as any given user, make
-sure you have DEBUG set to true in your configuration (or `export SCI_DEBUG =
-1` to temporarily set this up), then visit the app with a "debuguser" query
-argument.  For example, `http://localhost:8080/?debuguser=jechols`.
+You'll need to set up a database for SCI to store its faculty/course
+association.  For development, this is trivial by using docker-compose:
+`docker-compose.yml` defines a database with username, password, and database
+name of "sci" (which match the defaults in the example configuration).  Simply
+run `docker-compose up -d` to start it.
+
+Once your database is up, run `make dbmigrate` to run the goose migrations.
+
+### Verify config
+
+Make sure you've got `sci.conf` set up for development.
+
+### Populate the database
+
+You will need to populate the "sci" database tables with any fake (or real)
+courses and user ids.
+
+You can load a small sample of test data by importing all the SQL in `seed.sql`
+into your dockerized database container:
+
+```bash
+docker-compose exec db mysql -usci -psci -Dsci -e "source /tmp/seed.sql"
+```
+
+**Note**: on your first use, or after docker volumes have been destroyed, you'll want to
+seed data.  But you don't re-run seeds every time you start up the server.
+
+### Run SCI
+
+Simply type `./bin/sci server`.  The command reads your local `sci.conf`, so it
+doesn't need any command-line configuration.
+
+### Log in
+
+Visit `http://localhost:8080` (if your sci.conf kept the default port) and you
+should see the app's "not authorized" page, and you'll be logged in as
+"dummyuser" in place of a real authorization.
+
+In debug mode, you can fake a login as any other user by visiting the page with
+a "debuguser" query argument.  For example, `http://localhost:8080/?debuguser=jechols`.
+The page will have a large, visible warning if it is in debug mode to avoid
+accidentally pushing debug to production.
+
+If you used the seed data, use the "debuguser" argument to sign in as
+"dsgnprof", "aaapprof", or "noidear" and you'll see different lists of courses
+you can fake-add students to.
+
+Development loop
+---
 
 If you install [entr](http://www.entrproject.org/), you can speed up your
 development loop by running [`./scripts/devloop.sh`](./scripts/devloop.sh),
 which runs [`makerun.sh`](./scripts/makerun.sh) whenever `entr` detects a
 change to any file or directory under `src/`.
+
+Build and test
+---
+
+You can build the binary by simply running `make`, but it's advised that you
+also validate the code and run tests before pushing anything up:
+
+```bash
+make validate
+make test
+make
+```
+
+Banner Import
+---
+
+You can also import actual Banner export files with the CSV importer.  You'll
+need to change your `BANNER_CSV_PATH` variable and then run the importer:
+
+```bash
+SCI_BANNER_CSV_PATH="/path/to/dev/seed/data" ./bin/sci import-csv
+```
+
+Once you have populated the database, you can fake a login as any real users to
+see what courses are available for attaching students.

@@ -10,7 +10,7 @@ deps: version
 
 binaries: version
 	$(GO) install ./src/...
-	$(GO) build -o bin/sci github.com/uoregon-libraries/student-course-integrator
+	$(GO) build -o bin/sci
 
 format: version
 	@$(GOFMT) main.go
@@ -23,10 +23,12 @@ test: version
 	@$(GO) test ./... | grep -v "^?.*no test files"
 
 version:
-	@./scripts/hackversion.sh
+	@go generate ./src/version
+	@chmod a+w src/version/build.go 2>/dev/null || true
 
 clean:
 	rm bin/* -f
+	rm src/version/commit.go -f
 
-dbconf:
-	./scripts/makedbconf.sh
+dbmigrate:
+	./scripts/dbmigrate.sh

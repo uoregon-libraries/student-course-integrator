@@ -15,5 +15,6 @@ services:
       - MYSQL_PASSWORD=sci
     volumes:
       - db:/var/lib/mysql
+      - ./seed.sql:/tmp/seed.sql
     ports:
       - 3306:3306
