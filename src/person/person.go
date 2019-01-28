@@ -15,8 +15,8 @@ import (
 type Person struct {
 	BannerID     string // "95 number"
 	DuckID       string
-	Affiliations []string
-	DisplayName  string
+	Affiliations []string // Affiliations: things like faculty, staff, GTF, etc
+	DisplayName  string   // Banner's display name for the individual
 }
 
 // FindByDuckID searches LDAP for the given duckid and returns a Person record
@@ -55,14 +55,17 @@ func FindByDuckID(duckid string) (*Person, error) {
 	return p, nil
 }
 
+// validGEAffiliations stores our list of which UO LDAP affiliations are valid
+// for determining if somebody is allowed to be assigned as a GE
+var validGEAffiliations = map[string]bool{
+	"gtf": true,
+}
+
 // CanBeGE returns true if this person's affiliations allow being assigned as a
 // GE on a course
 func (p *Person) CanBeGE() bool {
-	var validAffiliations = map[string]bool{
-		"gtf": true,
-	}
 	for _, aff := range p.Affiliations {
-		if validAffiliations[aff] {
+		if validGEAffiliations[aff] {
 			return true
 		}
 	}

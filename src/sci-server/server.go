@@ -16,6 +16,8 @@ type server struct {
 	Debug   bool   // If true, middleware for hacking userid is added
 }
 
+// Listen sets up all the routing for our web server, then listens indefinitely
+// for HTTP connections
 func (s *server) Listen() {
 	var r = mux.NewRouter()
 
