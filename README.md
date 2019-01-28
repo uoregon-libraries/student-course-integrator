@@ -127,6 +127,10 @@ docker-compose up -d
 # the project, then again anytime a migration is added
 make dbmigrate
 
+# Get all the dependencies and build
+make deps
+make
+
 # Populate the database - this must happen **only once**, otherwise any local
 # changes to courses or faculty will be destroyed.
 docker-compose exec db mysql -usci -psci -Dsci -e "source /tmp/seed.sql"
