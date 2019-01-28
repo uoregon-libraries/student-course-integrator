@@ -11,11 +11,12 @@ import (
 	"github.com/uoregon-libraries/student-course-integrator/src/data/user"
 )
 
+// homeVars stores data for the home template to use
 type homeVars struct {
-	Alert string
-	Info  string
-	User  *user.User
-	Form  *form
+	Alert string     // Alert, if set, is displayed as a bootstrappy alert on the page
+	Info  string     // Info, if set, is displayed as a bootstrappy info section on the page
+	User  *user.User // User is set to the logged-in user
+	Form  *form      // Form stores all the submitted form data, if any
 }
 
 // homeHandler encapsulates basic data and functionality for handling input and
@@ -25,6 +26,7 @@ type homeHandler struct {
 	confirmTemplate *tmpl.Template
 }
 
+// hHome generates a homeHandler structure for serving pages via http.ServeHTTP
 func hHome() *homeHandler {
 	var r = layout.Clone()
 	return &homeHandler{
