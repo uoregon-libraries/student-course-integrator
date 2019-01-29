@@ -65,6 +65,14 @@ Get goose for database migrations: `go get -u bitbucket.org/liamstask/goose/...`
 Verify it worked and that your paths are all set up: `goose --help`.  You
 should get a "usage" blurb.
 
+### Get golint
+
+`golint` is a tool for analyzing your Go code to look for various best practices.
+
+```bash
+go get -u golang.org/x/lint/golint
+```
+
 ### Configure SCI
 
 Copy the example configuration and edit it:
@@ -118,6 +126,10 @@ docker-compose up -d
 # Migrate the database - this must happen at least once when you first start
 # the project, then again anytime a migration is added
 make dbmigrate
+
+# Get all the dependencies and build
+make deps
+make
 
 # Populate the database - this must happen **only once**, otherwise any local
 # changes to courses or faculty will be destroyed.
