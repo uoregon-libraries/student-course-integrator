@@ -32,3 +32,5 @@ clean:
 
 dbmigrate:
 	./scripts/dbmigrate.sh
+
+ci: deps binaries validate test
