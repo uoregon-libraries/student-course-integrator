@@ -53,20 +53,24 @@ func (r *responder) processSubmission() {
 		return
 	}
 
-	var msg = fmt.Sprintf("GE %q -> course %q", f.DuckID, f.CRN)
+	// Set up all the key/value pairs we want to store in the audit log
+	var auditVals = map[string]string{
+		"crn":     f.CRN,
+		"duckid":  f.DuckID,
+		"confirm": f.Confirm,
+	}
 
 	// Explicit rejection of duckid was requested: re-render the form
 	if f.Confirm == "0" {
-		msg += `; rejected by user ("Go Back" clicked), re-rendering form`
-		audit.Log(r.vars.User, audit.ActionAssociateGE, msg)
+		audit.Log(r.vars.User, audit.ActionRejectSubmission, auditVals)
 		r.render(r.hh.formTemplate)
 		return
 	}
 
 	// Errors: re-render the form
 	if len(f.errors) > 0 {
-		msg += "; FAILURE: " + f.errorString()
-		audit.Log(r.vars.User, audit.ActionAssociateGE, msg)
+		auditVals["error"] = f.errorString()
+		audit.Log(r.vars.User, audit.ActionInvalidSubmission, auditVals)
 		r.vars.Alert = fmt.Sprintf("Error: %s", f.errorString())
 		r.render(r.hh.formTemplate)
 		return
@@ -74,13 +78,12 @@ func (r *responder) processSubmission() {
 
 	// Require "confirm" to be exactly the string "1" so that we err on the side of not adding GEs
 	if f.Confirm == "1" {
-		msg += "; CONFIRMED"
 		err = enrollment.AddGE(f.CRN, f.GE.BannerID)
 		if err != nil {
 			r.render500(fmt.Errorf("unable to write enrollment data to database: %s", err))
 			return
 		}
-		audit.Log(r.vars.User, audit.ActionAssociateGE, msg)
+		audit.Log(r.vars.User, audit.ActionConfirmSubmission, auditVals)
 		var s = getSession(r.w, r.req)
 		s.SetInfoFlash(fmt.Sprintf(`%s (%s) added to %s`,
 			f.GE.DisplayName, f.GE.DuckID, f.Course.Description))
@@ -89,8 +92,7 @@ func (r *responder) processSubmission() {
 	}
 
 	// No valid "confirm" value, so we need to render the confirmation page
-	msg += "; requesting confirmation"
-	audit.Log(r.vars.User, audit.ActionAssociateGE, msg)
+	audit.Log(r.vars.User, audit.ActionSubmissionPending, auditVals)
 	r.render(r.hh.confirmTemplate)
 }
 
