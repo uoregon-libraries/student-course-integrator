@@ -203,6 +203,10 @@ You can build the binary by simply running `make`, but it's advised that you
 also validate the code and run tests before pushing anything up:
 
 ```bash
+# Validate, test, and build in a single command
+make ci
+
+# Or run the validation, test, and build commands individually
 make validate
 make test
 make
