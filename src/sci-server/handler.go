@@ -58,6 +58,7 @@ func (r *responder) processSubmission() {
 		"crn":     f.CRN,
 		"duckid":  f.DuckID,
 		"confirm": f.Confirm,
+		"role":    "GE",
 	}
 
 	// Explicit rejection of duckid was requested: re-render the form
