@@ -21,6 +21,9 @@ const (
 	ActionConfirmSubmission Action = "submission_confirmed"
 )
 
+// Log writes an audit log to the database, serializing the data to a JSON
+// string.  If the database connection fails for any reason, we complain loudly
+// to the standard logger ("CRIT" level).
 func Log(u *user.User, action Action, data map[string]string) {
 	var content, err = json.Marshal(data)
 	// This supposedly isn't possible when marshaling a string->string map, but I
