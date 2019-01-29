@@ -39,6 +39,18 @@
       </div>
 
       <div class="form-group row">
+        <label for="crn" class="col-sm-2 col-form-label">Role</label>
+        <div class="col-sm-10">
+          <select class="form-control" name="role" id="role">
+            <option value="">Select a role</option>
+          {{range .Form.Roles}}
+            <option value="{{.}}" {{if eq .0 $.Form.Role}}selected {{end}}>{{.}}</option>
+          {{end}}
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group row">
         <div class="col-sm-10 offset-sm-2">
           <button type="submit" class="btn btn-primary">Submit</button>
         </div>

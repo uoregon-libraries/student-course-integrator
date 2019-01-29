@@ -16,6 +16,7 @@ type form struct {
 	CRN     string // CRN holds the submitted dropdown value for the selected course, e.g., "201704.X3159"
 	DuckID  string // DuckID holds the submitted duckid of the user being added, e.g., "echjeremy"
 	Confirm string // Confirm is "1" when the form is re-submitted after confirmation of the GE by name
+	Role    string // Role holds the submitted dropdown value for the selected role, e.g., "GE"
 
 	// Derived fields
 	User   *user.User     // User gets populated with the faculty member who is logged in
@@ -73,3 +74,5 @@ func (f form) errorString() string {
 	}
 	return strings.Join(strs, ", ")
 }
+
+var Roles = [2]string{"GE", "Grader"}
