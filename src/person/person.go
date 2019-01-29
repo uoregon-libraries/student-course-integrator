@@ -21,32 +21,32 @@ type Person struct {
 	DisplayName  string   // Banner's display name for the individual
 }
 
-// FindByDuckID searches LDAP for the given duckid and returns a Person record
+// Find searches LDAP for the given id (either duckid or bannerid) and returns a Person record
 // filled in with the details needed for SCI
-func FindByDuckID(duckid string) (*Person, error) {
+func Find(stringID string) (*Person, error) {
 	var c, err = connect()
 	if err != nil {
 		return nil, err
 	}
 	defer c.lc.Close()
 
-	var s = service.DuckID(duckid)
-	if IsBannerID(duckid) {
-		s = service.BannerID(duckid)
+	var s = service.DuckID(stringID)
+	if IsBannerID(stringID) {
+		s = service.BannerID(stringID)
 	}
-	var serviceErr = s.Call()
-	if serviceErr != nil {
-		return nil, fmt.Errorf("unable to look up Banner ID for %s: %s", duckid, serviceErr)
+	err = s.Call()
+	if err != nil {
+		return nil, fmt.Errorf("unable to look up Banner ID for %s: %s", stringID, err)
 	}
 	var r = s.Response
 	if r.StatusCode == 404 {
 		return nil, nil
 	}
 	if r.StatusCode != 200 {
-		return nil, fmt.Errorf("service: status %d looking up %s: %s", r.StatusCode, duckid, r.Message)
+		return nil, fmt.Errorf("service: status %d looking up %s: %s", r.StatusCode, stringID, r.Message)
 	}
 	if r.User.BannerID == "" {
-		return nil, fmt.Errorf("lookup for duckid %s: response contains empty Banner ID", duckid)
+		return nil, fmt.Errorf("lookup for duckid %s: response contains empty Banner ID", stringID)
 	}
 	var p *Person
 	p, err = c.find(r.User.DuckID)
@@ -77,9 +77,9 @@ func (p *Person) CanBeGE() bool {
 	return false
 }
 
-// IsBannerID returns true if id is a 9 digit number
+// IsBannerID returns true if id is a 95 number
 func IsBannerID(stringID string) bool {
 	clean := strings.Replace(stringID, "-", "", -1)
-	re := regexp.MustCompile("[0-9]{9}")
+	re := regexp.MustCompile("95[0-9]{7}")
 	return re.MatchString(clean)
 }
