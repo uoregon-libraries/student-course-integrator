@@ -1,4 +1,4 @@
-.PHONY: all deps binaries test clean dbconf
+.PHONY: all deps binaries format validate test version clean dbmigrate ci
 
 GO=go
 GOFMT=gofmt -s -l -w
@@ -32,3 +32,5 @@ clean:
 
 dbmigrate:
 	./scripts/dbmigrate.sh
+
+ci: deps binaries validate test
