@@ -3,6 +3,7 @@ package sciserver
 import (
 	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/uoregon-libraries/gopkg/tmpl"
 	"github.com/uoregon-libraries/gopkg/webutil"
@@ -36,69 +37,93 @@ func hHome() *homeHandler {
 	}
 }
 
-// ServeHTTP implements http.Handler for homeHandler
+// audit writes an audit log in the database which includes the raw form data
+// and any form errors
+func (r *responder) audit(f *form, a audit.Action) {
+	var data = make(map[string]string)
+	data["crn"] = f.CRN
+	data["duckid"] = f.DuckID
+	data["confirm"] = f.Confirm
+	data["role"] = "GE"
+	if len(f.errors) > 0 {
+		data["errors"] = f.errorString()
+	}
+
+	audit.Log(r.vars.User, a, data)
+}
+
+// ServeHTTP implements http.Handler for homeHandler.  It warms the central IS
+// cache, generates a responder, and tells it to figure out what to do
 func (h *homeHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	warmCache()
 	var r = respond(w, req, h)
-	if req.Method == "POST" {
-		r.processSubmission()
-		return
-	}
-	r.serveForm()
+	r.route()
 }
 
-func (r *responder) processSubmission() {
+// route uses the form data to determine where to go, as we actually handle
+// every action in a single URI due to my quick-and-dirty approach on the
+// initial rush to get the code done.
+//
+// All audit logging happens here to help with code re-use (e.g., serveForm is
+// used in several situations that log different actions)
+func (r *responder) route() {
+	// The easy case: if it's not a POST request, we simply show the main form
+	if strings.ToUpper(r.req.Method) != "POST" {
+		r.serveForm()
+		return
+	}
+
+	// It's a POST.  All posts have the same form data right now, so we parse it
+	// before anything else.
 	var f, err = r.getForm()
 	if err != nil {
 		r.render500(fmt.Errorf("unable to instantiate form data: %s", err))
 		return
 	}
 
-	// Set up all the key/value pairs we want to store in the audit log
-	var auditVals = map[string]string{
-		"crn":     f.CRN,
-		"duckid":  f.DuckID,
-		"confirm": f.Confirm,
-		"role":    "GE",
-	}
-
-	// Explicit rejection of duckid was requested: re-render the form
-	if f.Confirm == "0" {
-		audit.Log(r.vars.User, audit.ActionRejectSubmission, auditVals)
-		r.render(r.hh.formTemplate)
-		return
-	}
-
-	// Errors: re-render the form
+	// One or more form errors: re-render and return
 	if len(f.errors) > 0 {
-		auditVals["error"] = f.errorString()
-		audit.Log(r.vars.User, audit.ActionInvalidSubmission, auditVals)
-		r.vars.Alert = fmt.Sprintf("Error: %s", f.errorString())
-		r.render(r.hh.formTemplate)
+		r.audit(f, audit.ActionInvalidSubmission)
+		r.vars.Alert = "Error: " + f.errorString()
+		r.serveForm()
 		return
 	}
 
-	// Require "confirm" to be exactly the string "1" so that we err on the side of not adding GEs
-	if f.Confirm == "1" {
-		err = enrollment.AddGE(f.CRN, f.GE.BannerID)
-		if err != nil {
-			r.render500(fmt.Errorf("unable to write enrollment data to database: %s", err))
-			return
-		}
-		audit.Log(r.vars.User, audit.ActionConfirmSubmission, auditVals)
-		var s = getSession(r.w, r.req)
-		s.SetInfoFlash(fmt.Sprintf(`%s (%s) added to %s`,
-			f.GE.DisplayName, f.GE.DuckID, f.Course.Description))
-		http.Redirect(r.w, r.req, webutil.FullPath(""), http.StatusFound)
+	// All other routing is dependent on the value of the "confirm" arg:
+	// - 0 means the user said "go back" on the confirmation page
+	// - 1 means the user said "confirm" on the confirmation page
+	// - no value (or anything unknown) means the user submitted the main form,
+	//   but hasn't seen the confirmation page yet
+	switch f.Confirm {
+	case "0":
+		r.audit(f, audit.ActionRejectSubmission)
+		r.serveForm()
+	case "1":
+		r.audit(f, audit.ActionConfirmSubmission)
+		r.addGE(f)
+	default:
+		r.audit(f, audit.ActionSubmissionPending)
+		r.serveConfirmForm()
+	}
+}
+
+func (r *responder) addGE(f *form) {
+	var err = enrollment.AddGE(f.CRN, f.GE.BannerID)
+	if err != nil {
+		r.render500(fmt.Errorf("unable to write enrollment data to database: %s", err))
 		return
 	}
-
-	// No valid "confirm" value, so we need to render the confirmation page
-	audit.Log(r.vars.User, audit.ActionSubmissionPending, auditVals)
-	r.render(r.hh.confirmTemplate)
+	var s = getSession(r.w, r.req)
+	s.SetInfoFlash(fmt.Sprintf(`%s (%s) added to %s`, f.GE.DisplayName, f.GE.DuckID, f.Course.Description))
+	http.Redirect(r.w, r.req, webutil.FullPath(""), http.StatusFound)
 }
 
 // serveForm has no logic to handle, just a form to render
 func (r *responder) serveForm() {
 	r.render(r.hh.formTemplate)
+}
+
+// serveConfirmForm just renders the confirmation page
+func (r *responder) serveConfirmForm() {
+	r.render(r.hh.confirmTemplate)
 }
