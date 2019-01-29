@@ -45,8 +45,9 @@ func (r *responder) getForm() (f *form, err error) {
 		return f, err
 	}
 
-	// Make sure the duckid is valid and represents somebody who can be a GE
-	f.GE, err = person.FindByDuckID(f.DuckID)
+	// Find will handle either a duckid or a bannerid and return a ldap-person record if valid.
+	// Make sure the record represents somebody who can be a GE
+	f.GE, err = person.Find(f.DuckID)
 	if err != nil {
 		return f, err
 	}
