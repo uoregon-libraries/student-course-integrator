@@ -78,7 +78,7 @@ func (p *Person) CanBeGE() bool {
 }
 
 // BannerIDRegex pattern for use in match in isBannerID()
-var BannerIDRegex = regexp.MustCompile("95[0-9]{7}$")
+var BannerIDRegex = regexp.MustCompile("^95[0-9]{7}$")
 
 // isBannerID returns true if id is a 95 number
 func isBannerID(stringID string) bool {
