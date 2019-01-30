@@ -14,6 +14,7 @@
 <form id="association-form" method="POST" action="{{FullPath ""}}">
   <input type="hidden" name="duckid" id="duckid" value="{{.Form.DuckID}}"/>
   <input type="hidden" name="crn" id="crn" value="{{.Form.CRN}}" />
+  <input type="hidden" name="role" id="role" value="{{.Form.Role}}" />
   <button class="btn btn-success" type="submit" name="confirm" value="1" class="prevent-double-click">Confirm</button>
   <button class="btn btn-secondary" type="submit" name="confirm" value="0" class="prevent-double-click">Go Back</button>
 </form>
