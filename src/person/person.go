@@ -7,6 +7,7 @@ import (
 	"regexp"
 	"strings"
 
+	"github.com/uoregon-libraries/student-course-integrator/src/roles"
 	"github.com/uoregon-libraries/student-course-integrator/src/service"
 )
 
@@ -60,21 +61,42 @@ func Find(stringID string) (*Person, error) {
 
 }
 
+// CanBeRole returns true if this person's affiliations allow being assigned
+// the given role on a course
+func (p *Person) CanBeRole(role string) bool {
+	switch role {
+	case roles.GE:
+		return p.canBeGE()
+	case roles.Grader:
+		return p.canBeGrader()
+	}
+
+	return false
+}
+
 // validGEAffiliations stores our list of which UO LDAP affiliations are valid
 // for determining if somebody is allowed to be assigned as a GE
 var validGEAffiliations = map[string]bool{
 	"gtf": true,
 }
 
-// CanBeGE returns true if this person's affiliations allow being assigned as a
-// GE on a course
-func (p *Person) CanBeGE() bool {
+// canBeGE is true if the person has at least one affiliation from our
+// hard-coded map for GEs
+func (p *Person) canBeGE() bool {
 	for _, aff := range p.Affiliations {
 		if validGEAffiliations[aff] {
 			return true
 		}
 	}
 	return false
+}
+
+// canBeGrader is always true, as the logic for permitting this is that the
+// faculty member must have a form on file: not something we can validate with
+// code.  If this changes in any way, at least we have the placeholder here to
+// add logic / restrictions.
+func (p *Person) canBeGrader() bool {
+	return true
 }
 
 // BannerIDRegex pattern for use in match in isBannerID()
