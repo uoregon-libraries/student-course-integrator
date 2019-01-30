@@ -42,7 +42,7 @@ func (r *responder) getForm() (f *form, err error) {
 		f.errors = append(f.errors, errors.New("a course must be chosen"))
 	}
 	if f.Role == "" {
-	    f.errors = append(f.errors, errors.New("a role must be chosen"))
+		f.errors = append(f.errors, errors.New("a role must be chosen"))
 	}
 	// if we have a missing field, we don't bother with further validation
 	if len(f.errors) > 0 {
