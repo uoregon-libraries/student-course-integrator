@@ -8,13 +8,14 @@ import (
 	"github.com/Nerdmaster/magicsql"
 	"github.com/uoregon-libraries/gopkg/fileutil"
 	"github.com/uoregon-libraries/student-course-integrator/src/global"
+	"github.com/uoregon-libraries/student-course-integrator/src/roles"
 )
 
 // AddGE creates a new GE record for a course, ready to be exported on the next canvas export job
 func AddGE(courseID, userID string) error {
 	var sql = "INSERT INTO enrollments (`course_id`, `user_id`, `role`, `section_id`, `status`)" +
-		"VALUES(?, ?, 'GE', '', 'active')"
-	var _, err = global.DB.Exec(sql, courseID, userID)
+		"VALUES(?, ?, ?, '', 'active')"
+	var _, err = global.DB.Exec(sql, courseID, userID, roles.GE)
 	return err
 }
 

@@ -9,6 +9,7 @@ import (
 	"github.com/uoregon-libraries/student-course-integrator/src/data/audit"
 	"github.com/uoregon-libraries/student-course-integrator/src/data/enrollment"
 	"github.com/uoregon-libraries/student-course-integrator/src/data/user"
+	"github.com/uoregon-libraries/student-course-integrator/src/roles"
 )
 
 // homeVars stores data for the home template to use
@@ -59,7 +60,7 @@ func (r *responder) processSubmission() {
 		"crn":     f.CRN,
 		"duckid":  f.DuckID,
 		"confirm": f.Confirm,
-		"role":    "GE",
+		"role":    roles.GE,
 	}
 
 	// Explicit rejection of duckid was requested: re-render the form
