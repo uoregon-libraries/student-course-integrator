@@ -37,6 +37,7 @@ func (r *responder) getForm() (f *form, err error) {
 	f.Confirm = r.req.PostFormValue("confirm")
 	f.User = r.vars.User
 	f.Role = r.req.PostFormValue("role")
+	f.GraderConfirmed = r.req.PostFormValue("graderReqMet")
 
 	if f.DuckID == "" {
 		f.errors = append(f.errors, errors.New("duckid must be filled out"))
@@ -53,15 +54,25 @@ func (r *responder) getForm() (f *form, err error) {
 	}
 
 	// Find will handle either a duckid or a bannerid and return a ldap-person record if valid.
-	// Make sure the record represents somebody who can be a GE
-	f.GE, err = person.Find(f.DuckID)
+	// Make sure the record represents someone in the system
+	f.Agent, err = person.Find(f.DuckID)
 	if err != nil {
 		return f, err
 	}
-	if f.GE == nil {
-		f.errors = append(f.errors, errors.New("nobody with this duckid exists"))
-	} else if !f.GE.CanBeGE() {
-		f.errors = append(f.errors, errors.New(f.GE.DisplayName+" is currently not classified as a GE"))
+	if f.Agent == nil {
+		f.errors = append(f.errors, errors.New("nobody with this ID exists"))
+	} else {
+		switch f.Role {
+		case roles.GE:
+			if !f.Agent.CanBeGE() {
+				f.errors = append(f.errors, errors.New(f.Agent.DisplayName+" is currently not classified as a GE"))
+			}
+		case roles.Grader:
+			f.GraderConfReqd = "1"
+			if f.Confirm == "1" && f.GraderConfirmed != "1" {
+				f.errors = append(f.errors, errors.New(f.Agent.DisplayName+" must meet the Grader requirement"))
+			}
+		}
 	}
 
 	// Make sure the logged-in user is allowed to assign people to this crn
