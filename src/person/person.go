@@ -31,7 +31,7 @@ func Find(stringID string) (*Person, error) {
 	defer c.lc.Close()
 
 	var s = service.DuckID(stringID)
-	if IsBannerID(stringID) {
+	if isBannerID(stringID) {
 		s = service.BannerID(stringID)
 	}
 	err = s.Call()
@@ -77,9 +77,11 @@ func (p *Person) CanBeGE() bool {
 	return false
 }
 
-// IsBannerID returns true if id is a 95 number
-func IsBannerID(stringID string) bool {
+// BannerIDRegex pattern for use in match in isBannerID()
+var BannerIDRegex = regexp.MustCompile("95[0-9]{7}$")
+
+// isBannerID returns true if id is a 95 number
+func isBannerID(stringID string) bool {
 	clean := strings.Replace(stringID, "-", "", -1)
-	re := regexp.MustCompile("95[0-9]{7}")
-	return re.MatchString(clean)
+	return BannerIDRegex.MatchString(clean)
 }
