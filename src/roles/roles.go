@@ -1,9 +1,10 @@
 package roles
 
-// Roles lists the roles
+// Roles contains the roles that can be assigned by users of the app.
 var Roles = []string{"GE", "Grader"}
 
-func validateRole(role string) bool {
+// IsValid checks that the value being passed around is valid.
+func IsValid(role string) bool {
 
 	for _, element := range Roles {
 		if role == element {
