@@ -77,5 +77,3 @@ func (f form) errorString() string {
 	}
 	return strings.Join(strs, ", ")
 }
-
-var Roles = [2]string{"GE", "Grader"}
