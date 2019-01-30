@@ -5,6 +5,7 @@ import (
 
 	"github.com/uoregon-libraries/gopkg/logger"
 	"github.com/uoregon-libraries/gopkg/tmpl"
+	"github.com/uoregon-libraries/student-course-integrator/src/roles"
 )
 
 // responder wraps the writer and request to provide us a simpler approach to
@@ -18,8 +19,7 @@ type responder struct {
 
 func respond(w http.ResponseWriter, req *http.Request, hh *homeHandler) *responder {
 	var user = getContextUser(req)
-	var r = &responder{w: w, req: req, hh: hh, vars: &homeVars{User: user, Form: &form{}}}
-
+	var r = &responder{w: w, req: req, hh: hh, vars: &homeVars{User: user, Form: &form{}, Roles: roles.Roles}}
 	var s = getSession(w, req)
 	r.vars.Info = s.GetInfoFlash()
 	r.vars.Alert = s.GetAlertFlash()

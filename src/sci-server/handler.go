@@ -18,6 +18,7 @@ type homeVars struct {
 	Info  string     // Info, if set, is displayed as a bootstrappy info section on the page
 	User  *user.User // User is set to the logged-in user
 	Form  *form      // Form stores all the submitted form data, if any
+	Roles []string   // Roles to be displayed in dropdown
 }
 
 // homeHandler encapsulates basic data and functionality for handling input and
