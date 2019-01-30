@@ -44,7 +44,7 @@ func (r *responder) audit(f *form, a audit.Action) {
 	data["crn"] = f.CRN
 	data["duckid"] = f.DuckID
 	data["confirm"] = f.Confirm
-	data["role"] = "GE"
+	data["role"] = f.Role
 	if len(f.errors) > 0 {
 		data["errors"] = f.errorString()
 	}
