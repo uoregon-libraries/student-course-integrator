@@ -7,6 +7,7 @@ import (
 	"github.com/uoregon-libraries/student-course-integrator/src/data/course"
 	"github.com/uoregon-libraries/student-course-integrator/src/data/user"
 	"github.com/uoregon-libraries/student-course-integrator/src/person"
+	"github.com/uoregon-libraries/student-course-integrator/src/roles"
 )
 
 // form holds the submission data as well as derived fields which are loaded
@@ -41,8 +42,8 @@ func (r *responder) getForm() (f *form, err error) {
 	if f.CRN == "" {
 		f.errors = append(f.errors, errors.New("a course must be chosen"))
 	}
-	if f.Role == "" {
-		f.errors = append(f.errors, errors.New("a role must be chosen"))
+	if f.Role == "" || !roles.IsValid(f.Role) {
+		f.errors = append(f.errors, errors.New("a valid role must be chosen"))
 	}
 	// if we have a missing field, we don't bother with further validation
 	if len(f.errors) > 0 {
