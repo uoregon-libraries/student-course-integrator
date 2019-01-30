@@ -43,8 +43,8 @@
         <div class="col-sm-10">
           <select class="form-control" name="role" id="role">
             <option value="">Select a role</option>
-          {{range .Form.Roles}}
-            <option value="{{.}}" {{if eq .0 $.Form.Role}}selected {{end}}>{{.}}</option>
+          {{range .Roles}}
+            <option value="{{.}}" {{if eq . $.Form.Role}}selected {{end}}>{{.}}</option>
           {{end}}
           </select>
         </div>
