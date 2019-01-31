@@ -38,7 +38,7 @@ func Find(stringID string) (*Person, error) {
 	if err != nil {
 		return nil, fmt.Errorf("unable to look up Banner ID for %s: %s", stringID, err)
 	}
-	var r = s.Response
+	var r = s.Response()
 	if r.StatusCode == 404 {
 		return nil, nil
 	}

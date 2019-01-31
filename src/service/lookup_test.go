@@ -24,13 +24,13 @@ func TestCallServiceSuccess(t *testing.T) {
 	s.get = _getMock
 	var err = s.Call()
 	assert.NilError(err, "DuckIDToBannerID", t)
-	assert.True(s.Response.User.BannerID != "", "bannerID isn't empty", t)
+	assert.True(s.Response().User.BannerID != "", "bannerID isn't empty", t)
 
 	var s2 = BannerID("test")
 	s2.get = _getMock
 	err = s2.Call()
 	assert.NilError(err, "BannerIDToDuckID", t)
-	assert.True(s2.Response.User.DuckID != "", "duckID isn't empty", t)
+	assert.True(s2.Response().User.DuckID != "", "duckID isn't empty", t)
 }
 
 func TestCallServiceFailure(t *testing.T) {
@@ -41,8 +41,8 @@ func TestCallServiceFailure(t *testing.T) {
 	var err = s.Call()
 
 	assert.NilError(err, "Service failure shouldn't be an error", t)
-	assert.Equal(500, s.Response.StatusCode, "service status", t)
-	assert.Equal("baby fall down go boom", s.Response.Message, "service message", t)
+	assert.Equal(500, s.Response().StatusCode, "service status", t)
+	assert.Equal("baby fall down go boom", s.Response().Message, "service message", t)
 }
 
 func TestCallServiceError(t *testing.T) {

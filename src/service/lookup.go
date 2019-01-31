@@ -11,7 +11,7 @@ import (
 type Lookup struct {
 	get      getter
 	uri      string
-	Response *Response
+	response *Response
 }
 
 // DuckID creates a Lookup for getting a user from a given duckid
@@ -52,5 +52,10 @@ func (l *Lookup) Call() error {
 		return err
 	}
 
-	return json.Unmarshal(content, &l.Response)
+	return json.Unmarshal(content, &l.response)
+}
+
+// Response returns the result of the most recent service call
+func (l *Lookup) Response() *Response {
+	return l.response
 }
