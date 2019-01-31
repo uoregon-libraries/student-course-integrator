@@ -114,7 +114,8 @@ func (r *responder) add(f *form) {
 		return
 	}
 	var s = getSession(r.w, r.req)
-	s.SetInfoFlash(fmt.Sprintf(`%s (%s) added to %s`, f.Agent.DisplayName, f.Agent.DuckID, f.Course.Description))
+	s.SetInfoFlash(fmt.Sprintf(`%s (%s) added to %s as a %s`,
+		f.Agent.DisplayName, f.Agent.DuckID, f.Course.Description, f.Role))
 	http.Redirect(r.w, r.req, webutil.FullPath(""), http.StatusFound)
 }
 
