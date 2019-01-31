@@ -7,8 +7,10 @@ import (
 	"regexp"
 	"strings"
 
+	"github.com/uoregon-libraries/student-course-integrator/src/ldapservice"
 	"github.com/uoregon-libraries/student-course-integrator/src/roles"
 	"github.com/uoregon-libraries/student-course-integrator/src/service"
+	ldap "gopkg.in/ldap.v2"
 )
 
 // A Person is different from a user in that this represents anybody at UO, not
@@ -22,24 +24,40 @@ type Person struct {
 	DisplayName  string   // Banner's display name for the individual
 }
 
+// serviceCaller is the interface used for calling the UO services which tell
+// us about a user's two main IDs
+type serviceCaller interface {
+	Call() error
+	Response() *service.Response
+}
+
+type ldapSearcher interface {
+	Search(string) (*ldap.Entry, error)
+}
+
 // Find searches LDAP for the given id (either duckid or bannerid) and returns a Person record
 // filled in with the details needed for SCI
 func Find(stringID string) (*Person, error) {
-	var c, err = connect()
+	var c, err = ldapservice.Connect()
 	if err != nil {
 		return nil, err
 	}
-	defer c.lc.Close()
+	defer c.Close()
 
 	var s = service.DuckID(stringID)
 	if isBannerID(stringID) {
 		s = service.BannerID(stringID)
 	}
-	err = s.Call()
+
+	return find(stringID, s, c)
+}
+
+func find(stringID string, s serviceCaller, ls ldapSearcher) (*Person, error) {
+	var err = s.Call()
 	if err != nil {
 		return nil, fmt.Errorf("unable to look up Banner ID for %s: %s", stringID, err)
 	}
-	var r = s.Response
+	var r = s.Response()
 	if r.StatusCode == 404 {
 		return nil, nil
 	}
@@ -49,16 +67,22 @@ func Find(stringID string) (*Person, error) {
 	if r.User.BannerID == "" {
 		return nil, fmt.Errorf("lookup for duckid %s: response contains empty Banner ID", stringID)
 	}
-	var p *Person
-	p, err = c.find(r.User.DuckID)
+
+	var entry *ldap.Entry
+	entry, err = ls.Search(r.User.DuckID)
 	if err != nil {
 		return nil, err
 	}
-	if p != nil {
-		p.BannerID = r.User.BannerID
+	if entry == nil {
+		return nil, nil
 	}
-	return p, nil
 
+	return &Person{
+		BannerID:     r.User.BannerID,
+		DuckID:       r.User.DuckID,
+		DisplayName:  entry.GetAttributeValue("displayName"),
+		Affiliations: entry.GetAttributeValues("UOAD-UoPersonAffiliation"),
+	}, nil
 }
 
 // CanBeRole returns true if this person's affiliations allow being assigned

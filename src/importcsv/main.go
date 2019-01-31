@@ -96,7 +96,7 @@ func buildData(op *magicsql.Operation, courses, enrollments [][]string) error {
 			if err != nil {
 				return fmt.Errorf("unable to look up duckid for %s: %s", userID, err)
 			}
-			var r = s.Response
+			var r = s.Response()
 			if r.StatusCode != 200 {
 				logger.Warnf("Unable to look up duckid for %s: (code %d) %s", userID, r.StatusCode, r.Message)
 				continue

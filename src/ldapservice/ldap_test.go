@@ -1,4 +1,4 @@
-package person
+package ldapservice
 
 import (
 	"os"
@@ -8,6 +8,7 @@ import (
 
 	"github.com/uoregon-libraries/student-course-integrator/src/config"
 	"github.com/uoregon-libraries/student-course-integrator/src/global"
+	ldap "gopkg.in/ldap.v2"
 )
 
 func TestSanitize(t *testing.T) {
@@ -31,21 +32,21 @@ func TestConnect(t *testing.T) {
 		t.Fatalf("Cannot test LDAP: config is invalid: %s", err)
 	}
 
-	var conn *connection
-	var person *Person
+	var conn *Connection
+	var entry *ldap.Entry
 	if strings.Contains(global.Conf.LDAPBaseDN, "uoregon") {
-		conn, err = connect()
+		conn, err = Connect()
 		if err != nil {
 			t.Fatalf("Unable to connect to ldap: %s", err)
 		}
 
-		person, err = conn.find("jechols")
+		entry, err = conn.Search("jechols")
 		if err != nil {
 			t.Fatalf("Unable to perform an LDAP search: %s", err)
 		}
-		if person.DisplayName != "Jeremy Echols" {
-			t.Fatalf("Expected person name to be Jeremy Echols, but got %q", person.DisplayName)
+		var dn = entry.GetAttributeValue("displayName")
+		if dn != "Jeremy Echols" {
+			t.Fatalf("Expected displayName to be Jeremy Echols, but got %q", dn)
 		}
-		t.Logf("Person data: %v", person)
 	}
 }
