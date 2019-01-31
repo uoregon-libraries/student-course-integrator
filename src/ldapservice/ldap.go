@@ -1,4 +1,4 @@
-package person
+package ldapservice
 
 import (
 	"crypto/tls"
@@ -9,15 +9,15 @@ import (
 	ldap "gopkg.in/ldap.v2"
 )
 
-// connection wraps ldap.Conn to provide search functionality
-type connection struct {
+// Connection wraps ldap.Conn to provide search functionality
+type Connection struct {
 	lc   *ldap.Conn
 	open bool
 }
 
-// connect starts a connection to the configured LDAP endpoint, which must
+// Connect starts a connection to the configured LDAP endpoint, which must
 // support TLS, then binds with the bind name / pass
-func connect() (*connection, error) {
+func Connect() (*Connection, error) {
 	var l, err = ldap.Dial("tcp", global.Conf.LDAPServer)
 	if err != nil {
 		return nil, err
@@ -35,34 +35,15 @@ func connect() (*connection, error) {
 		return nil, err
 	}
 
-	return &connection{lc: l, open: true}, nil
+	return &Connection{lc: l, open: true}, nil
 }
 
-// find creates a partially-populated Person record for the given duckid
-func (c *connection) find(duckid string) (*Person, error) {
-	var entry, err = c.search(duckid)
-
-	if err != nil {
-		return nil, err
-	}
-
-	if entry == nil {
-		return nil, nil
-	}
-
-	return &Person{
-		DuckID:       duckid,
-		DisplayName:  entry.GetAttributeValue("displayName"),
-		Affiliations: entry.GetAttributeValues("UOAD-UoPersonAffiliation"),
-	}, nil
-}
-
-// search runs a search against LDAP for the given duckid, returning the raw
+// Search runs a search against LDAP for the given duckid, returning the raw
 // LDAP record on success.  If LDAP fails, or the search finds more than one
 // person, it is considered unsuccessful and an error is returned.  If nobody
 // is found, a nil record is returned, but this is not considered an error,
 // just a nonexistent duckid.
-func (c *connection) search(duckid string) (*ldap.Entry, error) {
+func (c *Connection) Search(duckid string) (*ldap.Entry, error) {
 	// NewSearchRequest is way more painful to read than just instantiating the
 	// thing with named values
 	var req = &ldap.SearchRequest{
@@ -110,4 +91,9 @@ func sanitizeSearch(duckid string) string {
 	}
 
 	return duckid
+}
+
+// Close ends the underlying LDAP connection
+func (c *Connection) Close() {
+	c.lc.Close()
 }
