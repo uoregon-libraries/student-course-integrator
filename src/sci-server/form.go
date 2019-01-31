@@ -59,15 +59,14 @@ func (r *responder) getForm() (f *form, err error) {
 	if err != nil {
 		return f, err
 	}
+
 	if f.Agent == nil {
 		f.errors = append(f.errors, errors.New("nobody with this ID exists"))
 	} else {
-		switch f.Role {
-		case roles.GE:
-			if !f.Agent.CanBeGE() {
-				f.errors = append(f.errors, errors.New(f.Agent.DisplayName+" is currently not classified as a GE"))
-			}
-		case roles.Grader:
+		if !f.Agent.CanBeRole(f.Role) {
+			f.errors = append(f.errors, errors.New(f.Agent.DisplayName+" is currently not classified as a "+f.Role))
+		}
+		if f.Role == roles.Grader {
 			f.GraderConfReqd = "1"
 			if f.Confirm == "1" && f.GraderConfirmed != "1" {
 				f.errors = append(f.errors, errors.New(f.Agent.DisplayName+" must meet the Grader requirement"))
