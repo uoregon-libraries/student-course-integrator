@@ -108,13 +108,13 @@ func (r *responder) route() {
 }
 
 func (r *responder) addGE(f *form) {
-	var err = enrollment.AddGE(f.CRN, f.GE.BannerID)
+	var err = enrollment.AddGE(f.CRN, f.Agent.BannerID)
 	if err != nil {
 		r.render500(fmt.Errorf("unable to write enrollment data to database: %s", err))
 		return
 	}
 	var s = getSession(r.w, r.req)
-	s.SetInfoFlash(fmt.Sprintf(`%s (%s) added to %s`, f.GE.DisplayName, f.GE.DuckID, f.Course.Description))
+	s.SetInfoFlash(fmt.Sprintf(`%s (%s) added to %s`, f.Agent.DisplayName, f.Agent.DuckID, f.Course.Description))
 	http.Redirect(r.w, r.req, webutil.FullPath(""), http.StatusFound)
 }
 
