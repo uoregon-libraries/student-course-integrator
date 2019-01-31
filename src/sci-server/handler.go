@@ -100,15 +100,15 @@ func (r *responder) route() {
 		r.serveForm()
 	case "1":
 		r.audit(f, audit.ActionConfirmSubmission)
-		r.addGE(f)
+		r.add(f)
 	default:
 		r.audit(f, audit.ActionSubmissionPending)
 		r.serveConfirmForm()
 	}
 }
 
-func (r *responder) addGE(f *form) {
-	var err = enrollment.AddGE(f.CRN, f.Agent.BannerID)
+func (r *responder) add(f *form) {
+	var err = enrollment.Add(f.CRN, f.Agent.BannerID, f.Role)
 	if err != nil {
 		r.render500(fmt.Errorf("unable to write enrollment data to database: %s", err))
 		return
