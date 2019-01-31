@@ -4,8 +4,8 @@
 {{block "content" .}}
 
 <div class="alert alert-info">
-  You're about to add {{.Form.DuckID}} ({{.Form.GE.DisplayName}})
-  to CRN {{stripterm .Form.CRN}}, listed in Canvas as course:
+  You're about to add {{.Form.DuckID}} ({{.Form.Agent.DisplayName}})
+  to CRN {{stripterm .Form.CRN}} as a {{.Form.Role}}, listed in Canvas as course:
   {{.Form.Course.Description}}.
 
   If this is correct, please choose "Confirm" below.
@@ -15,6 +15,12 @@
   <input type="hidden" name="duckid" id="duckid" value="{{.Form.DuckID}}"/>
   <input type="hidden" name="crn" id="crn" value="{{.Form.CRN}}" />
   <input type="hidden" name="role" id="role" value="{{.Form.Role}}" />
+  <input type="hidden" name="graderConfReqd" id="graderConfReqd" value="{{.Form.GraderConfReqd}}" />
+  {{if eq .Form.GraderConfReqd "1" }}
+    <p>I agree this student can be a grader.
+    <input type="checkbox" name="graderReqMet" id="graderReqMet" value="1">
+    </p>
+  {{end}}
   <button class="btn btn-success" type="submit" name="confirm" value="1" class="prevent-double-click">Confirm</button>
   <button class="btn btn-secondary" type="submit" name="confirm" value="0" class="prevent-double-click">Go Back</button>
 </form>
