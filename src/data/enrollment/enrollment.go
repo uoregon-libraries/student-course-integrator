@@ -2,6 +2,7 @@ package enrollment
 
 import (
 	"encoding/csv"
+	"errors"
 	"fmt"
 	"time"
 
@@ -11,12 +12,16 @@ import (
 	"github.com/uoregon-libraries/student-course-integrator/src/roles"
 )
 
-// AddGE creates a new GE record for a course, ready to be exported on the next canvas export job
-func AddGE(courseID, userID string) error {
+// Add creates a new record for a course, ready to be exported on the next canvas export job
+func Add(courseID, userID, role string) error {
+	if !roles.IsValid(role) {
+		return errors.New("did not attempt to write to database, " + role + " is not a valid role.")
+	}
 	var sql = "INSERT INTO enrollments (`course_id`, `user_id`, `role`, `section_id`, `status`)" +
 		"VALUES(?, ?, ?, '', 'active')"
-	var _, err = global.DB.Exec(sql, courseID, userID, roles.GE)
+	var _, err = global.DB.Exec(sql, courseID, userID, role)
 	return err
+
 }
 
 // Export wraps the database and filesystem information surrounding a CSV
