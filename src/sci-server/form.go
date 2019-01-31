@@ -21,10 +21,9 @@ type form struct {
 	GraderConfirmed string // GraderConfirmed is set only if Grader and faculty clicks graderReqMet
 
 	// Derived fields
-	User           *user.User     // User gets populated with the faculty member who is logged in
-	Course         *course.Course // Course gets the course by looking up the faculty member + CRN
-	Agent          *person.Person // Agent is the person being assigned a role, after looking up the DuckID
-	GraderConfReqd string         // GraderConfReqd is "1" when role == Grader; for displaying the confirm checkbox
+	User   *user.User     // User gets populated with the faculty member who is logged in
+	Course *course.Course // Course gets the course by looking up the faculty member + CRN
+	Agent  *person.Person // Agent is the person being assigned a role, after looking up the DuckID
 
 	// Internal data
 	errors []error // errors will be populated with anything preventing the form submission, e.g., a bad duckid
@@ -67,13 +66,11 @@ func (r *responder) getForm() (f *form, err error) {
 			f.errors = append(f.errors, errors.New(f.Agent.DisplayName+" is currently not classified as a "+f.Role))
 		}
 		if f.Role == roles.Grader {
-			f.GraderConfReqd = "1"
 			if f.Confirm == "1" && f.GraderConfirmed != "1" {
 				f.errors = append(f.errors, errors.New(f.Agent.DisplayName+" must meet the Grader requirement"))
 			}
 		}
 	}
-
 	// Make sure the logged-in user is allowed to assign people to this crn
 	f.Course = f.User.FindCourse(f.CRN)
 	if f.Course == nil {
@@ -89,4 +86,11 @@ func (f form) errorString() string {
 		strs[i] = err.Error()
 	}
 	return strings.Join(strs, ", ")
+}
+
+func (f form) IsGrader() bool {
+	if f.Role == roles.Grader {
+		return true
+	}
+	return false
 }
