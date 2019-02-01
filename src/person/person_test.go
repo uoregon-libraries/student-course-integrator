@@ -53,34 +53,34 @@ type testvars struct {
 	duckID        string
 	status        int
 	lookupMessage string
-	ldapMessage   string
+	lookupErr     string
 }
 
 var tvars = testvars{"950123456", "ssmith", 200, "", ""}
-var c = FakeLdap{tvars.duckID, attrs}
+var c = FakeLdap{tvars.duckID, attrs, ""}
 var user = service.User{BannerID: tvars.bannerID, DuckID: tvars.duckID}
 
 func TestFindSuccess(t *testing.T) {
-	var s = FakeLookup{User: user, Message: tvars.lookupMessage, StatusCode: tvars.status, err: tvars.ldapMessage}
+	var s = FakeLookup{User: user, Message: tvars.lookupMessage, StatusCode: tvars.status, err: tvars.lookupErr}
 	var response, err = find(tvars.duckID, &s, &c)
 	assert.True(response != nil, "returns a person", t)
 	assert.True(err == nil, "no errors", t)
 }
 
 func TestFindError(t *testing.T) {
-	tvars.ldapMessage = "something is busted"
-	var s = FakeLookup{User: user, Message: tvars.lookupMessage, StatusCode: tvars.status, err: tvars.ldapMessage}
+	tvars.lookupErr = "something is busted"
+	var s = FakeLookup{User: user, Message: tvars.lookupMessage, StatusCode: tvars.status, err: tvars.lookupErr}
 	var response, err = find(tvars.duckID, &s, &c)
 	assert.True(response == nil, "should return nil", t)
 	assert.True(strings.Contains(err.Error(), "unable to look up Banner ID"), "expected error text", t)
 	assert.True(strings.Contains(err.Error(), tvars.duckID), "expected error text", t)
-	assert.True(strings.Contains(err.Error(), tvars.ldapMessage), "expected error text", t)
+	assert.True(strings.Contains(err.Error(), tvars.lookupErr), "expected error text", t)
 }
 
 func TestFind404(t *testing.T) {
 	tvars.status = 404
-	tvars.ldapMessage = ""
-	var s = FakeLookup{User: user, Message: tvars.lookupMessage, StatusCode: tvars.status, err: tvars.ldapMessage}
+	tvars.lookupErr = ""
+	var s = FakeLookup{User: user, Message: tvars.lookupMessage, StatusCode: tvars.status, err: tvars.lookupErr}
 	var response, err = find(tvars.duckID, &s, &c)
 	assert.True(response == nil, "should return nil", t)
 	assert.True(err == nil, "but not an error", t)
@@ -89,7 +89,7 @@ func TestFind404(t *testing.T) {
 func TestFindNot200(t *testing.T) {
 	tvars.status = 418
 	tvars.lookupMessage = "time flies"
-	var s = FakeLookup{User: user, Message: tvars.lookupMessage, StatusCode: tvars.status, err: tvars.ldapMessage}
+	var s = FakeLookup{User: user, Message: tvars.lookupMessage, StatusCode: tvars.status, err: tvars.lookupErr}
 	var response, err = find(tvars.duckID, &s, &c)
 	assert.True(response == nil, "should return nil", t)
 	assert.True(strings.Contains(err.Error(), "service: status "+strconv.Itoa(tvars.status)), "expected error text", t)
