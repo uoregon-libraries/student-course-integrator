@@ -56,11 +56,15 @@ type testvars struct {
 	lookupErr     string
 }
 
-var tvars = testvars{"950123456", "ssmith", 200, "", ""}
-var c = FakeLdap{tvars.duckID, attrs, ""}
-var user = service.User{BannerID: tvars.bannerID, DuckID: tvars.duckID}
+func initTvars() testvars {
+	return testvars{"950123456", "ssmith", 200, "", ""}
+}
+
+var c = FakeLdap{initTvars().duckID, attrs, ""}
+var user = service.User{BannerID: initTvars().bannerID, DuckID: initTvars().duckID}
 
 func TestFindSuccess(t *testing.T) {
+	var tvars = initTvars()
 	var s = FakeLookup{User: user, Message: tvars.lookupMessage, StatusCode: tvars.status, err: tvars.lookupErr}
 	var response, err = find(tvars.duckID, &s, &c)
 	assert.True(response != nil, "returns a person", t)
@@ -68,6 +72,7 @@ func TestFindSuccess(t *testing.T) {
 }
 
 func TestFindError(t *testing.T) {
+	var tvars = initTvars()
 	tvars.lookupErr = "something is busted"
 	var s = FakeLookup{User: user, Message: tvars.lookupMessage, StatusCode: tvars.status, err: tvars.lookupErr}
 	var response, err = find(tvars.duckID, &s, &c)
@@ -78,8 +83,8 @@ func TestFindError(t *testing.T) {
 }
 
 func TestFind404(t *testing.T) {
+	var tvars = initTvars()
 	tvars.status = 404
-	tvars.lookupErr = ""
 	var s = FakeLookup{User: user, Message: tvars.lookupMessage, StatusCode: tvars.status, err: tvars.lookupErr}
 	var response, err = find(tvars.duckID, &s, &c)
 	assert.True(response == nil, "should return nil", t)
@@ -87,6 +92,7 @@ func TestFind404(t *testing.T) {
 }
 
 func TestFindNot200(t *testing.T) {
+	var tvars = initTvars()
 	tvars.status = 418
 	tvars.lookupMessage = "time flies"
 	var s = FakeLookup{User: user, Message: tvars.lookupMessage, StatusCode: tvars.status, err: tvars.lookupErr}
@@ -97,8 +103,8 @@ func TestFindNot200(t *testing.T) {
 }
 
 func TestFindNoBannerID(t *testing.T) {
+	var tvars = initTvars()
 	tvars.bannerID = ""
-	tvars.status = 200
 	var user = service.User{BannerID: tvars.bannerID, DuckID: tvars.duckID}
 	var s = FakeLookup{User: user, Message: tvars.lookupMessage, StatusCode: tvars.status, err: tvars.lookupErr}
 	var response, err = find(tvars.duckID, &s, &c)
@@ -107,7 +113,7 @@ func TestFindNoBannerID(t *testing.T) {
 }
 
 func TestFindSearchFail(t *testing.T) {
-	tvars.bannerID = "950123456"
+	var tvars = initTvars()
 	var ldapErr = "something went wrong"
 	var s = FakeLookup{User: user, Message: tvars.lookupMessage, StatusCode: tvars.status, err: tvars.lookupErr}
 	var c = FakeLdap{tvars.duckID, attrs, ldapErr}
