@@ -33,9 +33,13 @@ func (f *FakeLookup) Response() *service.Response {
 type FakeLdap struct {
 	dn         string
 	attributes []*ldap.EntryAttribute
+	err        string
 }
 
 func (f *FakeLdap) Search(id string) (*ldap.Entry, error) {
+	if f.err != "" {
+		return nil, errors.New(f.err)
+	}
 	return &ldap.Entry{DN: f.dn, Attributes: f.attributes}, nil
 }
 
@@ -96,10 +100,20 @@ func TestFindNoBannerID(t *testing.T) {
 	tvars.bannerID = ""
 	tvars.status = 200
 	var user = service.User{BannerID: tvars.bannerID, DuckID: tvars.duckID}
-	var s = FakeLookup{User: user, Message: tvars.lookupMessage, StatusCode: tvars.status, err: tvars.ldapMessage}
+	var s = FakeLookup{User: user, Message: tvars.lookupMessage, StatusCode: tvars.status, err: tvars.lookupErr}
 	var response, err = find(tvars.duckID, &s, &c)
 	assert.True(response == nil, "find response should be nil", t)
 	assert.True(strings.Contains(err.Error(), "lookup for duckid "+tvars.duckID), "expected error text", t)
+}
+
+func TestFindSearchFail(t *testing.T) {
+	tvars.bannerID = "950123456"
+	var ldapErr = "something went wrong"
+	var s = FakeLookup{User: user, Message: tvars.lookupMessage, StatusCode: tvars.status, err: tvars.lookupErr}
+	var c = FakeLdap{tvars.duckID, attrs, ldapErr}
+	var response, err = find(tvars.duckID, &s, &c)
+	assert.True(response == nil, "response should be nil", t)
+	assert.True(strings.Contains(err.Error(), ldapErr), "expected error text", t)
 }
 
 func TestCanBeRoleGE(t *testing.T) {
