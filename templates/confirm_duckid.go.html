@@ -15,9 +15,9 @@
   <input type="hidden" name="duckid" id="duckid" value="{{.Form.DuckID}}"/>
   <input type="hidden" name="crn" id="crn" value="{{.Form.CRN}}" />
   <input type="hidden" name="role" id="role" value="{{.Form.Role}}" />
-  <input type="hidden" name="graderConfReqd" id="graderConfReqd" value="{{.Form.GraderConfReqd}}" />
-  {{if eq .Form.GraderConfReqd "1" }}
-    <p>I agree this student can be a grader.
+  {{if .Form.IsGrader }}
+    <p>
+    <label for="graderReqMet">I agree this student can be a grader:</label>
     <input type="checkbox" name="graderReqMet" id="graderReqMet" value="1">
     </p>
   {{end}}
