@@ -4,11 +4,16 @@
 {{block "content" .}}
 
 <div class="alert alert-info">
-  You're about to add {{.Form.DuckID}} ({{.Form.Agent.DisplayName}})
-  to CRN {{stripterm .Form.CRN}} as a {{.Form.Role}}, listed in Canvas as course:
-  {{.Form.Course.Description}}.
+  <p>
+    You're about to associate
+    <strong>{{.Form.Agent.DisplayName}}</strong> (<i>{{.Form.Agent.DuckID}} / {{.Form.Agent.BannerID}}</i>)
+    as a <strong>{{.Form.Role}}</strong>
+    on Canvas course "<strong>{{.Form.Course.Description}}</strong>" (<i>CRN {{stripterm .Form.CRN}}</i>).
+  </p>
 
-  If this is correct, please choose "Confirm" below.
+  <p>
+    If this is correct, please choose "Confirm" below.
+  </p>
 </div>
 
 <form id="association-form" method="POST" action="{{FullPath ""}}">
