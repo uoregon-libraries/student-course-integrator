@@ -11,13 +11,20 @@ command -v goose >/dev/null 2>&1 || {
   exit 1
 }
 
-if [[ -f /etc/sci.conf ]]; then
+DB="${SCI_DB:-}"
+if [[ "$DB" != "" ]]; then
+  echo "Using db config from environment"
+elif [[ -f /etc/sci.conf ]]; then
+  echo "Reading db config from /etc/sci.conf"
   source /etc/sci.conf
 elif [[ -f ./sci.conf ]]; then
+  echo "Reading db config from ./sci.conf"
   source ./sci.conf
 else
   echo >&2 "You must have /etc/sci.conf or ./sci.conf for migrate.sh to work"
   exit 1
 fi
 
+echo 'Executing goose'
 goose -dir ./db/migrations mysql "$DB" up
+echo "Database migration completed"
