@@ -1,3 +1,5 @@
 /bin
 /sci.conf
 /src/version/commit.go
+/.env
+/docker-compose.override.yml

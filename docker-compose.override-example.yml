@@ -1,0 +1,25 @@
+# Copy this to docker-compose.override.yml and modify for your needs.  This
+# should work well as-is for a development environment.
+version: "3.4"
+
+volumes:
+  db:
+
+services:
+  web:
+    # Mount the local binary and other static files so that we can make changes
+    # and recompile locally rather than rebuilding the images
+    volumes:
+      - ./static:/app/static
+      - ./templates:/app/templates
+
+      # Comment this out **unless** you compile SCI locally!
+      - ./bin/sci:/app/sci
+
+    # Debug mode ... ACTIVATE!
+    environment:
+      - SCI_DEBUG=1
+
+    # Expose port 8080 to the host
+    ports:
+      - 8080:8080

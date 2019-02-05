@@ -1,8 +1,24 @@
-Setup (for developers)
---
+This README is not meant to help end-users.  That's a guide we also need but
+don't have time to work on right now.
 
-This is not meant to help end-users.  That's a guide we also need but don't
-have time to work on right now.
+**Note**: For best results, you should compile and test locally.  This is
+easier and faster than doing it through docker.
+
+If you opt not to compile and test locally, you'll have to rebuild the images
+every time you change code.  This makes the edit-compile-test loop go from
+speedy-quick (typical Go) to awful (though still not as bad as Java and Ruby).
+This is not officially supported due to the high risk of perpetuating the
+belief that slow restarts are acceptable to web developers.
+
+If you want to set things up manually for a fully local setup, the
+docker-compose.yml and Dockerfile will help guide you, but the documentation no
+longer supports doing this.  Having two sets of documents simply didn't work
+out well (especially since the old manual setup still involved docker for the
+database).  And while full-local dev is very fast and ever-so-convenient, we
+needed a single unified Docker setup for our staging server.  Bleah.
+
+Preliminary Setup
+---
 
 ### Install and set up Go
 
@@ -47,9 +63,8 @@ something isn't making sense, knowing how GOPATH works can help.
 
 ### Download SCI
 
-Diehards would recommend using `go get`, but it's sort of magic, it tries to
-compile things you don't necessarily want, and it's just a lot clearer if you
-do a git clone.
+Diehards would recommend using `go get`, but it's sort of magic.  It's just a
+lot clearer if you do a git clone.
 
 ```bash
 mkdir -p $GOPATH/src/github.com/uoregon-libraries
@@ -58,36 +73,51 @@ git clone git@github.com:uoregon-libraries/student-course-integrator.git \
 cd $GOPATH/src/github.com/uoregon-libraries/student-course-integrator
 ```
 
-### Get Goose
-
-Get goose for database migrations: `go get -u github.com/pressly/goose/cmd/goose`
-
-Verify it worked and that your paths are all set up: `goose --help`.  You
-should get a "usage" blurb.
-
 ### Get golint
 
-`golint` is a tool for analyzing your Go code to look for various best practices.
+`golint` is a tool for analyzing your Go code to look for various best
+practices, and is required by the test suite:
 
 ```bash
 go get -u golang.org/x/lint/golint
 ```
 
-### Configure SCI
+Docker Setup
+---
 
-Copy the example configuration and edit it:
+- Build and run all tests so all the necessary generated files are owned by you: `make ci`
+- [Install docker-compose](https://docs.docker.com/compose/install/#install-compose)
+- Copy `env-example` to `.env` and adjust the configurations as necessary
+  - All configuration values in `env-example` will need to be changed
+  - Explanations of all configuration options are commented in `./example.conf`.  *You should read these*.
+- Copy `./docker-compose.override-example.yml` to `./docker-compose.override-example.yml`
+  - This should work without alterations, but you should still look it over and
+    make sure it makes sense for your workstation
+
+Development
+---
+
+Run the server: `docker-compose up`
+
+When code changes, rebuild and restart the "web" service:
 
 ```bash
-cp example.conf sci.conf
-vim sci.conf
+make
+docker-compose restart web
 ```
 
-You don't have to use vim, of course.  Neovim is also acceptable.
+You can build the binary by simply running `make`, but it's advised that you
+also validate the code and run tests before pushing anything up:
 
-Look over the file carefully, you will need to configure several things to make
-SCI run locally.  The example configuration is set up to make development
-easier, but there are still details not filled in.  The file is well-commented
-to ensure easier understanding of the configuration needs.
+```bash
+# Validate, test, and build in a single command
+make ci
+
+# Or run the validation, test, and build commands individually
+make validate
+make test
+make
+```
 
 SCI's Settings
 ---
@@ -112,110 +142,30 @@ export SCI_LDAP_BIND_PASS="s3cur3!"
 export SCI_LDAP_BASE_DN="dc=ad,dc=mysite,dc=org"
 ```
 
-Run the server
+The mix of configuration file and environment is how the docker setup works,
+letting us control some settings, like the database connection, while putting
+others in the devs' hands.
+
+Log in
 ---
 
-### Summary
-
-Read below for details, but this is the quick setup info:
-
-```bash
-# Start up the database server if you haven't already done so
-docker-compose up -d
-
-# Migrate the database - this must happen at least once when you first start
-# the project, then again anytime a migration is added
-make dbmigrate
-
-# Get all the dependencies and build
-make deps
-make
-
-# Populate the database - this must happen **only once**, otherwise any local
-# changes to courses or faculty will be destroyed.
-docker-compose exec db mysql -usci -psci -Dsci -e "source /tmp/seed.sql"
-
-# Run the SCI http listener
-./bin/sci server
-```
-
-### Prepare the database
-
-You'll need to set up a database for SCI to store its faculty/course
-association.  For development, this is trivial by using docker-compose:
-`docker-compose.yml` defines a database with username, password, and database
-name of "sci" (which match the defaults in the example configuration).  Simply
-run `docker-compose up -d` to start it.
-
-Once your database is up, run `make dbmigrate` to run the goose migrations.
-
-### Verify config
-
-Make sure you've got `sci.conf` set up for development.
-
-### Populate the database
-
-You will need to populate the "sci" database tables with any fake (or real)
-courses and user ids.
-
-You can load a small sample of test data by importing all the SQL in `seed.sql`
-into your dockerized database container:
-
-```bash
-docker-compose exec db mysql -usci -psci -Dsci -e "source /tmp/seed.sql"
-```
-
-**Note**: on your first use, or after docker volumes have been destroyed, you'll want to
-seed data.  But you don't re-run seeds every time you start up the server.
-
-### Run SCI
-
-Simply type `./bin/sci server`.  The command reads your local `sci.conf`, so it
-doesn't need any command-line configuration.
-
-### Log in
-
-Visit `http://localhost:8080` (if your sci.conf kept the default port) and you
-should see the app's "not authorized" page, and you'll be logged in as
-"dummyuser" in place of a real authorization.
+Visit `http://localhost:8080` (assuming you didn't adjust the default port in
+the docker override) and you should see the app's "not authorized" page, and
+you'll be logged in as "dummyuser" in place of a real authorization.
 
 In debug mode, you can fake a login as any other user by visiting the page with
 a "debuguser" query argument.  For example, `http://localhost:8080/?debuguser=jechols`.
 The page will have a large, visible warning if it is in debug mode to avoid
 accidentally pushing debug to production.
 
-If you used the seed data, use the "debuguser" argument to sign in as
-"dsgnprof", "aaapprof", or "noidear" and you'll see different lists of courses
-you can fake-add students to.
-
-Development loop
----
-
-If you install [entr](http://www.entrproject.org/), you can speed up your
-development loop by running [`./scripts/devloop.sh`](./scripts/devloop.sh),
-which runs [`makerun.sh`](./scripts/makerun.sh) whenever `entr` detects a
-change to any file or directory under `src/`.
-
-Build and test
----
-
-You can build the binary by simply running `make`, but it's advised that you
-also validate the code and run tests before pushing anything up:
-
-```bash
-# Validate, test, and build in a single command
-make ci
-
-# Or run the validation, test, and build commands individually
-make validate
-make test
-make
-```
+In development, docker auto-loads some seed data.  Use the "debuguser" argument
+to sign in as "dsgnprof", "aaapprof", or "noidear" and you'll see different
+lists of courses you can fake-add students to.
 
 Banner Import
 ---
 
-You can also import actual Banner export files with the CSV importer.  You'll
+You can import actual Banner export files with the CSV importer.  You'll
 need to change your `BANNER_CSV_PATH` variable and then run the importer:
 
 ```bash
