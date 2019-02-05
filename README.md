@@ -60,7 +60,7 @@ cd $GOPATH/src/github.com/uoregon-libraries/student-course-integrator
 
 ### Get Goose
 
-Get goose for database migrations: `go get -u bitbucket.org/liamstask/goose/...`
+Get goose for database migrations: `go get -u github.com/pressly/goose/cmd/goose`
 
 Verify it worked and that your paths are all set up: `goose --help`.  You
 should get a "usage" blurb.
