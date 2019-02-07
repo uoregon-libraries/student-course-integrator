@@ -80,8 +80,7 @@ fi
 process_done
 
 process_start "Migrating the database"
-./scripts/makedbconf.sh
-goose up
+./scripts/dbmigrate.sh
 process_done
 
 process_start "Doing a daemon reload and starting the service"

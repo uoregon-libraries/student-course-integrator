@@ -1,0 +1,16 @@
+# These are all the config settings that are likely to need to be kept secret.
+# Everything else should remain at its default value for docker-compose to
+# work.
+#
+# Copy this file to ".env" so that docker-compose pulls these in to override
+# the default config.
+SCI_SESSION_SECRET=changeme
+SCI_LDAP_SERVER=example.org:389
+SCI_LDAP_BIND_USER=ldapuser
+SCI_LDAP_BIND_PASS=ldappass
+SCI_LDAP_BASE_DN=dc=ad,dc=example,dc=org
+SCI_LOOKUP_BY_DUCKID_URL=https://blah.uoregon.edu/lookup?duckid={{duckid}}
+SCI_LOOKUP_BY_BANNERID_URL=https://blah.uoregon.edu/lookup?bannerid={{bannerid}}
+SCI_TRANSLATOR_API_HEADERS=foo:barbaz:quuz
+SCI_CANVAS_API_URL=https://blah.uoregon.edu/canvas-import
+SCI_CANVAS_API_HEADERS=foo:barbaz:quux

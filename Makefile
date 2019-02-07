@@ -10,7 +10,7 @@ deps: version
 
 binaries: version
 	$(GO) install ./src/...
-	$(GO) build -o bin/sci
+	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 $(GO) build -ldflags="-s -w" -o bin/sci
 
 format: version
 	@$(GOFMT) main.go

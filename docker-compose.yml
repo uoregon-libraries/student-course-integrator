@@ -1,11 +1,30 @@
-# This configuration is strictly for development purposes.  It doesn't
-# encapsulate the Go binaries in any way, just sets up dependencies.
-version: '2'
+version: "3.4"
 
 volumes:
   db:
 
 services:
+  web:
+    build:
+      context: .
+    depends_on:
+      - db
+    volumes:
+      - ./example.conf:/etc/sci.conf
+    command: /app/sci server
+    environment:
+      - SCI_DEBUG=0
+      - SCI_SESSION_SECRET
+      - SCI_LDAP_SERVER
+      - SCI_LDAP_BIND_USER
+      - SCI_LDAP_BIND_PASS
+      - SCI_LDAP_BASE_DN
+      - SCI_LOOKUP_BY_DUCKID_URL
+      - SCI_LOOKUP_BY_BANNERID_URL
+      - SCI_TRANSLATOR_API_HEADERS
+      - SCI_CANVAS_API_URL
+      - SCI_CANVAS_API_HEADERS
+
   db:
     image: mariadb
     environment:
@@ -15,6 +34,3 @@ services:
       - MYSQL_PASSWORD=sci
     volumes:
       - db:/var/lib/mysql
-      - ./seed.sql:/tmp/seed.sql
-    ports:
-      - 3306:3306
