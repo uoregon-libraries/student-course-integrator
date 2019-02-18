@@ -16,17 +16,21 @@
   </p>
 </div>
 
-<form id="association-form" method="POST" action="{{FullPath ""}}">
+<form id="association-form-confirm" method="POST" action="{{FullPath ""}}">
   <input type="hidden" name="duckid" id="duckid" value="{{.Form.DuckID}}"/>
   <input type="hidden" name="crn" id="crn" value="{{.Form.CRN}}" />
   <input type="hidden" name="role" id="role" value="{{.Form.Role}}" />
   {{if .Form.IsGrader }}
     <p>
     <label for="graderReqMet">I agree this student can be a grader:</label>
-    <input type="checkbox" name="graderReqMet" id="graderReqMet" value="1">
+    <input type="checkbox" name="graderReqMet" id="graderReqMet" required value="1">
     </p>
   {{end}}
-  <button class="btn btn-success" type="submit" name="confirm" value="1" class="prevent-double-click">Confirm</button>
-  <button class="btn btn-secondary" type="submit" name="confirm" value="0" class="prevent-double-click">Go Back</button>
+  <button class="btn btn-success" type="submit" name="confirm" value="1" id="submit-confirm" class="prevent-double-click">Confirm</button>
+  <button class="btn btn-secondary" type="submit" name="confirm" value="0" id="submit-go-back" class="prevent-double-click">Go Back</button>
 </form>
+{{end}}
+
+{{block "extrajs" .}}
+{{IncludeJS "enforce_confirm"}}
 {{end}}
