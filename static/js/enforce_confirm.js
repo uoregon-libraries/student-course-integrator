@@ -6,9 +6,10 @@ document.addEventListener("DOMContentLoaded", function() {
   });
 
   var agree = document.getElementById("graderReqMet");
-  agree.setCustomValidity("You must agree to the terms for assigning a Grader to a course");
+  var msg = "You must agree to the terms for assigning a Grader to a course";
+  agree.setCustomValidity(msg);
   agree.addEventListener("change", function() {
-    this.setCustomValidity(this.validity.valueMissing ? myCheckboxMsg : "");
+    this.setCustomValidity(this.validity.valueMissing ? msg : "");
   }, false);
 
 }, false);
