@@ -60,7 +60,7 @@ func (r *responder) getForm() (f *form, err error) {
 	}
 
 	if f.Agent == nil {
-		f.errors = append(f.errors, errors.New("nobody with this ID exists"))
+		f.errors = append(f.errors, errors.New(`nobody with this DuckID exists.  Please enter just the DuckID; no @uoregon.edu needed`))
 	} else {
 		if !f.Agent.CanBeRole(f.Role) {
 			f.errors = append(f.errors, errors.New(f.Agent.DisplayName+" is currently not classified as a "+f.Role))
