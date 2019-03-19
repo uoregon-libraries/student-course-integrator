@@ -15,7 +15,9 @@ RUN go get -d github.com/uoregon-libraries/student-course-integrator
 WORKDIR /go/src/github.com/uoregon-libraries/student-course-integrator
 RUN make deps && make
 
-# Add local code and rebuild the sci binary
+# Add local code and rebuild the sci binary - this includes .git so our version
+# reporting is accurate
+ADD .git ./.git
 ADD Makefile ./Makefile
 ADD db ./db
 ADD main.go ./main.go
