@@ -15,14 +15,16 @@ RUN go get -d github.com/uoregon-libraries/student-course-integrator
 WORKDIR /go/src/github.com/uoregon-libraries/student-course-integrator
 RUN make deps && make
 
-# Add local code and rebuild the sci binary
-ADD Makefile .
-ADD db .
-ADD main.go .
-ADD src .
-ADD static .
-ADD templates .
-RUN make
+# Add local code and rebuild the sci binary - this includes .git so our version
+# reporting is accurate
+ADD .git ./.git
+ADD Makefile ./Makefile
+ADD db ./db
+ADD main.go ./main.go
+ADD src ./src
+ADD static ./static
+ADD templates ./templates
+RUN make clean && make
 RUN upx ./bin/sci
 
 # Production step
