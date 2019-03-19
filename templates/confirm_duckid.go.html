@@ -6,14 +6,27 @@
 <div class="alert alert-info">
   <p>
     You're about to associate
-    <strong>{{.Form.Agent.DisplayName}}</strong> (<i>{{.Form.Agent.DuckID}} / {{.Form.Agent.BannerID}}</i>)
+    <strong>{{.Form.Agent.DisplayName}}</strong> (<i>{{.Form.Agent.DuckID}}</i>)
     as a <strong>{{.Form.Role}}</strong>
     on Canvas course "<strong>{{.Form.Course.Description}}</strong>" (<i>CRN {{stripterm .Form.CRN}}</i>).
   </p>
 
+{{if .Form.IsGrader}}
+  <p>
+    Students assigned as graders must demonstrate an understanding of the
+    confidentiality of student records by reading and signing the Code of
+    Responsibility for Security and Confidentiality of Education Records
+    and Files:
+    <a
+      href="https://registrar.uoregon.edu/sites/registrar2.uoregon.edu/files/pdf/Ferpa-Code-of-Responsibility.pdf"
+      target="_blank"
+      >FERPA Code of Responsibility (opens in a new tab / window)</a>
+  </p>
+{{else}}
   <p>
     If this is correct, please choose "Confirm" below.
   </p>
+{{end}}
 </div>
 
 <form id="association-form-confirm" method="POST" action="{{FullPath ""}}">
@@ -21,10 +34,18 @@
   <input type="hidden" name="crn" id="crn" value="{{.Form.CRN}}" />
   <input type="hidden" name="role" id="role" value="{{.Form.Role}}" />
   {{if .Form.IsGrader }}
-    <p>
-    <label for="graderReqMet">I agree this student can be a grader:</label>
-    <input type="checkbox" name="graderReqMet" id="graderReqMet" required value="1">
-    </p>
+    <div class="form-check">
+      <div class="form-check-input">
+        <input type="checkbox" name="graderReqMet" id="graderReqMet" required value="1">
+      </div>
+
+      <label class="form-check-label" for="graderReqMet">
+        I affirm that {{.Form.Agent.DisplayName}} has filled out, signed, and
+        dated the aforementioned FERPA Code of Responsibility, a copy of which is
+        maintained by the academic unit
+      </label>
+    </div>
+
   {{end}}
   <button class="btn btn-success" type="submit" name="confirm" value="1" id="submit-confirm" class="prevent-double-click">Confirm</button>
   <button class="btn btn-secondary" type="submit" name="confirm" value="0" id="submit-go-back" class="prevent-double-click">Go Back</button>
