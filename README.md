@@ -174,3 +174,29 @@ SCI_BANNER_CSV_PATH="/path/to/dev/seed/data" ./bin/sci import-csv
 
 Once you have populated the database, you can fake a login as any real users to
 see what courses are available for attaching students.
+
+Deploy
+---
+
+Deploying is typically done by first rsyncing production files (binaries, html
+templates, etc.) to the production server (in our case a RHEL system), stopping
+services, copying all those files to a production location, and restarting
+services.  All necessary commands are contained in some shell scripts:
+`scripts/build.sh` and `rhel7/deploy.sh`.
+
+*Note: the production server will need goose installed somewhere global, such as
+`/usr/local/bin/goose`.*
+
+```bash
+# Compile and copy all the files to production
+./scripts/build.sh production-server.uoregon.edu:/path/to/apps/sci
+
+# ssh in
+ssh production-server.uoregon.edu
+
+# Go to the application
+cd /path/to/apps/sci
+
+# Stop services, deploy the files, start services
+sudo ./rhel7/deploy.sh
+```
