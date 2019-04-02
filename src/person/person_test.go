@@ -122,10 +122,10 @@ func TestFindSearchFail(t *testing.T) {
 	assert.True(strings.Contains(err.Error(), ldapErr), "expected error text", t)
 }
 
-func TestCanBeRoleGE(t *testing.T) {
-	var pGE = Person{"950123456", "ssmith", []string{"gtf"}, "Sam Smith"}
-	var resultGE = pGE.CanBeRole(roles.GE)
-	assert.True(resultGE, "person can be a GE", t)
+func TestCanBeRoleTA(t *testing.T) {
+	var pTA = Person{"950123456", "ssmith", []string{"gtf"}, "Sam Smith"}
+	var resultTA = pTA.CanBeRole(roles.TA)
+	assert.True(resultTA, "person can be a TA", t)
 }
 
 func TestCanBeRoleGrader(t *testing.T) {
@@ -134,10 +134,10 @@ func TestCanBeRoleGrader(t *testing.T) {
 	assert.True(resultGr, "person can be a Grader", t)
 }
 
-func TestCanBeRoleGEFail(t *testing.T) {
-	var pGE = Person{"950123456", "ssmith", []string{""}, "Sam Smith"}
-	var resultGE = pGE.CanBeRole(roles.GE)
-	assert.False(resultGE, "person is not a GE", t)
+func TestCanBeRoleTAFail(t *testing.T) {
+	var pTA = Person{"950123456", "ssmith", []string{""}, "Sam Smith"}
+	var resultTA = pTA.CanBeRole(roles.TA)
+	assert.False(resultTA, "person is not a TA", t)
 }
 
 func TestIsBannerID(t *testing.T) {
