@@ -89,8 +89,8 @@ func find(stringID string, s serviceCaller, ls ldapSearcher) (*Person, error) {
 // the given role on a course
 func (p *Person) CanBeRole(role string) bool {
 	switch role {
-	case roles.GE:
-		return p.canBeGE()
+	case roles.TA:
+		return p.canBeTA()
 	case roles.Grader:
 		return p.canBeGrader()
 	}
@@ -98,17 +98,17 @@ func (p *Person) CanBeRole(role string) bool {
 	return false
 }
 
-// validGEAffiliations stores our list of which UO LDAP affiliations are valid
-// for determining if somebody is allowed to be assigned as a GE
-var validGEAffiliations = map[string]bool{
+// validTAAffiliations stores our list of which UO LDAP affiliations are valid
+// for determining if somebody is allowed to be assigned as a TA
+var validTAAffiliations = map[string]bool{
 	"gtf": true,
 }
 
-// canBeGE is true if the person has at least one affiliation from our
-// hard-coded map for GEs
-func (p *Person) canBeGE() bool {
+// canBeTA is true if the person has at least one affiliation from our
+// hard-coded map for TAs
+func (p *Person) canBeTA() bool {
 	for _, aff := range p.Affiliations {
-		if validGEAffiliations[aff] {
+		if validTAAffiliations[aff] {
 			return true
 		}
 	}

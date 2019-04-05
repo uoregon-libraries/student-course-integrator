@@ -124,6 +124,11 @@ func (e *Export) rowsStrings() [][]string {
 	var courseID, userID, role, sectionID, status string
 	for rows.Next() {
 		rows.Scan(&courseID, &userID, &role, &sectionID, &status)
+		// HACK: At some point GEs become TAs.  This allows us to keep the old
+		// version going, but with the export turned off, until Canvas is ready.
+		if role == "GE" {
+			role = roles.TA
+		}
 		csvRows = append(csvRows, []string{courseID, userID, role, sectionID, status})
 	}
 	return csvRows
