@@ -31,52 +31,7 @@ type form struct {
 
 func (r *responder) getForm() (f *form, err error) {
 	f = r.vars.Form
-	f.CRN = r.req.PostFormValue("crn")
-	f.DuckID = r.req.PostFormValue("duckid")
-	f.Confirm = r.req.PostFormValue("confirm")
-	f.User = r.vars.User
-	f.Role = r.req.PostFormValue("role")
-	f.GraderConfirmed = r.req.PostFormValue("graderReqMet")
-
-	if f.DuckID == "" {
-		f.errors = append(f.errors, errors.New("duckid must be filled out"))
-	}
-	if f.CRN == "" {
-		f.errors = append(f.errors, errors.New("a course must be chosen"))
-	}
-	if f.Role == "" || !roles.IsValid(f.Role) {
-		f.errors = append(f.errors, errors.New("a valid role must be chosen"))
-	}
-	// if we have a missing field, we don't bother with further validation
-	if len(f.errors) > 0 {
-		return f, err
-	}
-
-	// Find will handle either a duckid or a bannerid and return a ldap-person record if valid.
-	// Make sure the record represents someone in the system
-	f.Agent, err = person.Find(f.DuckID)
-	if err != nil {
-		return f, err
-	}
-
-	if f.Agent == nil {
-		f.errors = append(f.errors, errors.New(`nobody with this DuckID exists.  Please enter just the DuckID; no @uoregon.edu needed`))
-	} else {
-		if !f.Agent.CanBeRole(f.Role) {
-			f.errors = append(f.errors, errors.New(f.Agent.DisplayName+" is currently not classified as a "+f.Role))
-		}
-		if f.Role == roles.Grader {
-			if f.Confirm == "1" && f.GraderConfirmed != "1" {
-				f.errors = append(f.errors, errors.New(f.Agent.DisplayName+" must meet the Grader requirement"))
-			}
-		}
-	}
-	// Make sure the logged-in user is allowed to assign people to this crn
-	f.Course = f.User.FindCourse(f.CRN)
-	if f.Course == nil {
-		f.errors = append(f.errors, errors.New("the chosen course is invalid"))
-	}
-
+	f.errors = []error{errors.New("this process is no longer available")}
 	return f, err
 }
 
